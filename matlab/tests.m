@@ -41,7 +41,7 @@ for i=1:numel(a)
     grid
     legend(num2str(X.link_ids'))
     subplot(212)
-%     plot(X.time,X.flows,'LineWidth',2)
+    plot(X.time(1:end-1),X.flows,'LineWidth',2)
     ylabel('flow [vph]')
     grid
     

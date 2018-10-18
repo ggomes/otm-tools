@@ -276,7 +276,7 @@ classdef OTM < handle
                     
                     xind = index_into(link_id,X.link_ids);
                     switch char(output.getClass().getName())
-                        case 'output.LinkCount'
+                        case 'output.LinkFlow'
                             X.flows(xind,:) = diff(Java2Matlab(z.get_values))*3600/z.get_dt;
                         case 'output.LinkVehicles'
                             X.vehs(xind,:) = Java2Matlab(z.get_values);
