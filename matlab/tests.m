@@ -18,7 +18,7 @@ for i=1:numel(a)
         continue
     end
         
-    configfile = fullfile(config_folder,a(i).name);
+    configfile = fullfile(config_folder,a(i).name)
     sim_dt = 1;
     modelname = 'ctm';
     lanewidth = 3;

@@ -530,6 +530,10 @@ classdef Scenario < handle
             X = this.scenario.network.links.link(index_into(link_ids,all_link_ids));
         end
         
+        function X = get_link_lengths_meters(this,link_ids)
+            X = arrayfun(@(x) x.ATTRIBUTE.length,this.get_links(link_ids));
+        end
+        
         function X = get_link_connections(this,link_id)
             X = struct( 'start_node', nan , 'end_node',nan,...
                 'up_links',[],'dn_links',[]);

@@ -11,7 +11,6 @@ classdef OTM < handle
         signalMap
         fig
         sim_output
-        sim_dt
         start_time
         duration
     end
@@ -19,21 +18,11 @@ classdef OTM < handle
     methods(Access=public)
         
         % constructor
-        function [this] = OTM(configfile,sim_dt,modelname)
-            
-            if nargin<2
-                sim_dt = nan;
-            end
-            
-            if nargin<3
-                modelname='ctm';
-            end
-            
-            this.sim_dt = sim_dt;
+        function [this] = OTM(configfile)
             this.lanewidth = 3;
             this.configfile = configfile;
             import runner.OTM
-            this.api = OTM.load(configfile,sim_dt,true,modelname);
+            this.api = OTM.load(configfile,true);
             this.sim_output = [];
         end
         
@@ -246,7 +235,7 @@ classdef OTM < handle
             
             output_data = this.api.get_output_data();
             it = output_data.iterator();
-            X = struct('time',[],'vehs',[],'flows',[],'link_ids',[]);
+            X = struct('time',[],'vehs',[],'flows_vph',[],'speed_kph',[],'link_ids',[]);
             
             while(it.hasNext())
 
@@ -263,6 +252,7 @@ classdef OTM < handle
                     
                 for j=1:numel(link_ids)
                     link_id = link_ids(j);
+                 
                     z = output.get_profile_for_linkid(java.lang.Long(link_id));
                     time = Java2Matlab(z.get_times);
                     
@@ -277,15 +267,31 @@ classdef OTM < handle
                     xind = index_into(link_id,X.link_ids);
                     switch char(output.getClass().getName())
                         case 'output.LinkFlow'
-                            X.flows(xind,:) = diff(Java2Matlab(z.get_values))*3600/z.get_dt;
+                            X.flows_vph(xind,:) = diff(Java2Matlab(z.get_values))*3600/z.get_dt;
                         case 'output.LinkVehicles'
                             X.vehs(xind,:) = Java2Matlab(z.get_values);
                     end
-
+                    
                 end
                 
             end
-             
+            
+            for i=1:numel(X.link_ids)
+                link_id = X.link_ids(i);
+                link_info = this.api.get_link_with_id(link_id);
+                
+                if link_info.isIs_source()
+                    X.speed_kph(i,:) = nan(1,numel(X.time)-1);
+                    continue
+                end
+                
+                ffspeed_kph = link_info.get_ffspeed_kph();
+                link_length_km = link_info.getFull_length/1000;
+                speed_kph = link_length_km * X.flows_vph(i,:) ./ X.vehs(i,1:end-1);
+                speed_kph(speed_kph>ffspeed_kph) = ffspeed_kph;
+                X.speed_kph(i,:) = speed_kph;
+            end
+            
         end
         
 %         function [time,X] = get_state_trajectory(this,dt)
