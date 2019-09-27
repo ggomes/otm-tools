@@ -1,32 +1,31 @@
 clear
 close all
 
-configfile = 'C:\Users\gomes\code\otm\otm-base\src\main\resources\test_configs\onramp_offramp_1.xml';
-sim_dt = 2;
-modelname = 'ctm';
+configfile = 'C:\Users\gomes\code\otm\otm-base\src\main\resources\test_configs\line.xml';
 start_time = 0;
-duration = 6000;
+duration = 300;
+sim_dt = 2;
 
-otm = OTM(configfile,sim_dt,modelname);
+otm = OTMWrapper(configfile);
 
 otm.api.initialize(uint32(start_time));
 
 time = start_time;
 end_time = start_time + duration;
-plot_links = [1 2 3 7];
-link2lgs = Java2Matlab(otm.api.get_link2lgs());
+plot_links = [1 2 3];
+link2lgs = Java2Matlab(otm.api.scenario.get_link2lgs());
 
 empty_link_info = struct('lg_vehs',[]);
-vehs = repmat(empty_link_info ,duration/otm.sim_dt,numel(plot_links));
+vehs = repmat(empty_link_info ,duration/sim_dt,numel(plot_links));
 
 k = 1;
 while time < end_time
     
     % advance simulation
-    otm.api.advance(single(otm.sim_dt));
+    otm.api.advance(single(sim_dt));
     
     % exract cell vehicles
-    anim_info = otm.api.get_animation_info();
+    anim_info = otm.api.scenario.get_animation_info();
     for i=1:numel(plot_links)
         java_link_info = anim_info.get_link_info( plot_links(i) );
         link_info = empty_link_info;
@@ -42,7 +41,7 @@ while time < end_time
     end
     
     % advance time
-    time = time + otm.sim_dt;
+    time = time + sim_dt;
     k=k+1;
 end
 

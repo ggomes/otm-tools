@@ -6,6 +6,8 @@ config_folder = 'C:\Users\gomes\code\otm\otm-base\src\main\resources\test_config
 a = dir(config_folder);
 for i=1:numel(a)
     
+    i
+     
     if a(i).isdir
         continue
     end
@@ -18,6 +20,10 @@ for i=1:numel(a)
         continue
     end
         
+    if strcmp(a(i).name,'signal_nopocket.xml')
+        continue
+    end
+    
     configfile = fullfile(config_folder,a(i).name)
     sim_dt = 1;
     modelname = 'ctm';
@@ -26,7 +32,7 @@ for i=1:numel(a)
     time_period = [0 duration];
     out_dt = 10;
     
-    otm = OTM(configfile,sim_dt,modelname);
+    otm = OTMWrapper(configfile);
     
     x = Scenario(configfile);
     link_ids = x.get_link_ids;
@@ -41,7 +47,7 @@ for i=1:numel(a)
     grid
     legend(num2str(X.link_ids'))
     subplot(212)
-    plot(X.time(1:end-1),X.flows,'LineWidth',2)
+    plot(X.time(1:end-1),X.flows_vph,'LineWidth',2)
     ylabel('flow [vph]')
     grid
     

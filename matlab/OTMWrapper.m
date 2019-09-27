@@ -1,4 +1,4 @@
-classdef OTM < handle
+classdef OTMWrapper < handle
     
     properties(Access=public)
         configfile
@@ -18,11 +18,11 @@ classdef OTM < handle
     methods(Access=public)
         
         % constructor
-        function [this] = OTM(configfile)
+        function [this] = OTMWrapper(configfile)
             this.lanewidth = 3;
             this.configfile = configfile;
-            import runner.OTM
-            this.api = OTM.load(configfile,true);
+            import api.OTM
+            this.api = OTM.load(configfile);
             this.sim_output = [];
         end
         
@@ -150,8 +150,8 @@ classdef OTM < handle
                 for i=1:numel(request_links)
                     link_ids.add(java.lang.Long(request_links(i)));
                 end
-                this.api.request_links_flow([],link_ids, java.lang.Float(request_dt));
-                this.api.request_links_veh([],link_ids, java.lang.Float(request_dt));
+                this.api.output.request_links_flow([],link_ids, java.lang.Float(request_dt));
+                this.api.output.request_links_veh([],link_ids, java.lang.Float(request_dt));
             end
             
             % run the simulation
@@ -233,7 +233,7 @@ classdef OTM < handle
         
         function [X] = get_state_trajectory(this)
             
-            output_data = this.api.get_output_data();
+            output_data = this.api.output.get_data();
             it = output_data.iterator();
             X = struct('time',[],'vehs',[],'flows_vph',[],'speed_kph',[],'link_ids',[]);
             
@@ -267,7 +267,7 @@ classdef OTM < handle
                     xind = index_into(link_id,X.link_ids);
                     switch char(output.getClass().getName())
                         case 'output.LinkFlow'
-                            X.flows_vph(xind,:) = diff(Java2Matlab(z.get_values))*3600/z.get_dt;
+                            X.flows_vph(xind,:) = diff(Java2Matlab(z.get_values))*3600/double(z.get_dt);
                         case 'output.LinkVehicles'
                             X.vehs(xind,:) = Java2Matlab(z.get_values);
                     end
@@ -278,7 +278,7 @@ classdef OTM < handle
             
             for i=1:numel(X.link_ids)
                 link_id = X.link_ids(i);
-                link_info = this.api.get_link_with_id(link_id);
+                link_info = this.api.scenario.get_link_with_id(link_id);
                 
                 if link_info.isIs_source()
                     X.speed_kph(i,:) = nan(1,numel(X.time)-1);
