@@ -6,7 +6,7 @@ Tools for Open Traffic Models
 **Step 1.** Install [JAVA 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your computer.
 See how to check your current version of JAVA [here](https://www.java.com/en/download/help/version_manual.xml).
 
-**Step 2.** Obtain the OTM simulator jar file. Either build it from the [code](https://github.com/ggomes/otm-sim) or download it [here](https://mymavenrepo.com/repo/XtcMAROnIu3PyiMCmbdY/)
+**Step 2.** Obtain the OTM simulator jar file. Either build it from the [code](https://github.com/ggomes/otm-sim) or download it [here](https://mymavenrepo.com/repo/XtcMAROnIu3PyiMCmbdY/edu/berkeley/ucbtrans/otm-sim/1.0-SNAPSHOT/)
 
 **Step 3.** Download the otm-tools repository to your computer. 
 
