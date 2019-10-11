@@ -1,7 +1,8 @@
 clear
 close all
 
-configfile = 'C:\Users\gomes\code\otm\otm-base\src\main\resources\test_configs\line.xml';
+root = fileparts(fileparts(mfilename('fullpath')));
+configfile = fullfile(root,'configs','line.xml');
 start_time = 0;
 duration = 300;
 sim_dt = 2;
