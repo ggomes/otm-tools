@@ -26,4 +26,4 @@ Note: You will only be able to use Matlab + Java 8 by opening the Matlab app via
 
 **Step 6. (Matlab)** Add otm-tools/matlab **with subfolders** to Matlab's path. See instructions [here](https://www.mathworks.com/help/matlab/matlab_env/add-remove-or-reorder-folders-on-the-search-path.html). 
 
-**Step 7. (Matlab)** Run tests: otm-tools/matlab/tests.m. If this runs without error, you have succeeded in installing the package.
+**Step 7. (Matlab)** Run otm-tools/matlab/sample_script.m. If this runs without error, you have succeeded in installing the package.
