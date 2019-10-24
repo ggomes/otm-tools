@@ -31,7 +31,7 @@ classdef OTMWrapper < handle
         end
         
         % display the network
-        function [] = show_network(this,lanewidth)
+        function show_network(this,lanewidth)
             
             if nargin>=2
                 this.lanewidth = lanewidth;
@@ -55,7 +55,7 @@ classdef OTMWrapper < handle
                 link = links{i};
                 drawLinks(i) = DrawLink(link);
                 drawLinks(i).draw(link,link.lanegroups,this.lanewidth);
-                for j=1:link.lanegroups.size()
+                for j=1:numel(link.lanegroups)
                     lg = drawLinks(i).lanegroups(j);
                     this.laneGroupMap(lg.id) = lg;
                 end
@@ -75,6 +75,12 @@ classdef OTMWrapper < handle
             %                 this.signalMap(actuator.id) = DrawSignal(this,actuator);
             %             end
             
+        end
+        
+        function T = get_link_table(this)
+            val = values(this.get_links);
+            T = struct2table([val{:}]);
+            T = removevars(T,{'road_geom','shape','lanegroups'});
         end
         
         %         % run an animation

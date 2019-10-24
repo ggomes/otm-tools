@@ -25,7 +25,7 @@ classdef DrawLink < handle
             segments = DrawLink.extract_segments(points);
                         
             %  scale segement lengths
-            scale_factor = this.link_length / sum([segments.length]);
+%             scale_factor = this.link_length / sum([segments.length]);
 %             if abs(scale_factor-1) > 0.05
 %                 error('Geometric error is too large')
 %             end
@@ -37,10 +37,10 @@ classdef DrawLink < handle
 %             end
             
             % array of lanegroup objects
-            num_lanegroup = java_lanegroups.size();
+            num_lanegroup = numel(java_lanegroups);
             this.lanegroups(1:num_lanegroup) = DrawLaneGroup;
             for i=1:num_lanegroup
-                lg = java_lanegroups.get(i-1);
+                lg = java_lanegroups(i);
                 this.lanegroups(i) = DrawLaneGroup(lg,lanewidth,geom);
             end
             
@@ -84,9 +84,9 @@ classdef DrawLink < handle
         function [segments] = extract_segments(points)
             
             segments = repmat(struct('start_p',[],'end_p',[],'length',nan,'d',[],'n_start',[],'n_end',[]),1,numel(points)-1);
-            for i=1:points.size-1
-                this_point = points.get(i-1);
-                next_point = points.get(i);
+            for i=1:numel(points)-1
+                this_point = points(i);
+                next_point = points(i+1);
                 segments(i).start_p = [this_point.x this_point.y];
                 segments(i).end_p = [next_point.x next_point.y];
                 segments(i).length = norm(segments(i).end_p-segments(i).start_p);
