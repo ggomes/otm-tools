@@ -3,7 +3,8 @@ close all
 
 import api.OTM
 
-otm = OTMWrapper('~/code/otm/otm-base/src/main/resources/test_configs/line.xml');
+root = fileparts(fileparts(mfilename('fullpath')));
+otm = OTMWrapper(fullfile(root,'configs','line.xml'));
 
 X = otm.get_info()
 X = otm.get_models()
