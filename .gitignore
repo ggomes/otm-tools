@@ -1,3 +1,4 @@
 python/*
-java/*
-
+java/demos/demos.iml
+java/demos/*.png
+java/demos/out/
