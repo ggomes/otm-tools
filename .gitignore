@@ -1,4 +1,8 @@
-python/*
-java/demos/demos.iml
-java/demos/*.png
+*.pickle
+*.iml
+*.png
 java/demos/out/
+*/.ipynb_checkpoints/
+*/*.ipynb
+python/osm2otm/*.xml
+

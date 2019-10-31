@@ -1,0 +1,13 @@
+*.txt
+.idea
+*.iml
+*.exe
+*.pdf
+*.asv
+*.bmp
+*.jpg
+*.class
+*.lst
+.cache/
+.ipynb_checkpoints/
+__pycache__/
