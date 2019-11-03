@@ -1,4 +1,5 @@
+rundemos.sh
 plugin/
-demos/.idea/
-demos/*.png
-demos/out/
+*.png
+*.class
+
