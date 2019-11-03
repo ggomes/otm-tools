@@ -9,21 +9,17 @@ import inspect
 from py4j.java_gateway import JavaGateway, GatewayParameters
 
 
-class Java_Connection():
+class JavaConnect():
 
-    def __init__(self, decomposition_flag = False):
+    def __init__(self, port_num = 25335, decomposition_flag = False):
 
         self.process = None
         self.pid = None
-
-        #Port Number
-        port_num = 25335
-
         self.port_number = str(port_num)
 
         this_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
         root_folder = os.path.dirname(this_folder)
-        jar_file_name = os.path.join(root_folder,'target', 'otm-py4j-1.0-SNAPSHOT-jar-with-dependencies.jar')
+        jar_file_name = os.path.join(root_folder,'javacnct','target','otm-py4j-1.0-SNAPSHOT-jar-with-dependencies.jar')
 
         #First check if the file exists indeed:
         if os.path.isfile(jar_file_name):
@@ -42,7 +38,7 @@ class Java_Connection():
 
     def openWindows(self, jar_file_name, port_number):
         try:
-            self.process = subprocess.Popen(['java', '-jar', jar_file_name, port_number],
+            self.process = subprocess.Popen(['java', '-jar', jar_file_name, '-port',port_number],
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             self.pid = self.process.pid
             time.sleep(1)
@@ -56,7 +52,7 @@ class Java_Connection():
 
         if self.pid == 0:
             self.pid = os.getpid()
-            retcode = call(['java', '-jar', jar_file_name, port_number])
+            retcode = call(['java', '-jar', jar_file_name, '-port',port_number])
             sys.exit()
 
         # Here we wait for 0.5 sec to allow the java server to start

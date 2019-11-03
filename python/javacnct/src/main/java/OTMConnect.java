@@ -26,7 +26,7 @@ public class OTMConnect {
 			if(args.length==0) {
 				gatewayServer = new GatewayServer(new OTMConnect());
 				gatewayServer.start();
-				System.out.println("Gateway Server Started on port " + gatewayServer.getPort());
+				System.out.println("OTM connected on port " + gatewayServer.getPort());
 				return;
 			}
 			else {
@@ -39,7 +39,7 @@ public class OTMConnect {
 				if (cmd.equals("-port")) {
 					gatewayServer = new GatewayServer(new OTMConnect(), Integer.parseInt(args[1]));
 					gatewayServer.start();
-					System.out.println("Gateway Server Started on port " + gatewayServer.getPort());
+					System.out.println("OTM connected on port " + gatewayServer.getPort());
 					return;
 				}
 
@@ -47,7 +47,6 @@ public class OTMConnect {
 				else if (cmd.equals("-version")){
 					System.out.println("otm-base: " + OTMUtils.getBaseGitHash());
 					System.out.println("otm-sim: " + api.OTM.get_version());
-					System.out.println("otm-py4j: " + get_version());
 					return;
 				}
 
@@ -80,26 +79,5 @@ public class OTMConnect {
 						"\t-help\tDisplay this message.\n";
 		return str;
 	}
-
-	public static String get_version(){
-		InputStream inputStream = runner.OTM.class.getResourceAsStream("/otm-py4j.properties");
-		Properties properties = new Properties();
-		try {
-			properties.load(inputStream);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to read properties file", e);
-		}
-		finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-		}
-		return properties.getProperty("py4j.git");
-	}
-
 
 }

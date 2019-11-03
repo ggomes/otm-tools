@@ -29,7 +29,7 @@
         <plugins>
 
             <!-- version number -->
-            <plugin>
+<!--             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <version>1.1</version>
@@ -44,7 +44,7 @@
                 <configuration>
                     <revisionOnScmFailure>true</revisionOnScmFailure>
                 </configuration>
-            </plugin>
+            </plugin> -->
 
             <!-- MAVEN COMPILER -->
             <plugin>
@@ -62,7 +62,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Entry_Point_OTM</mainClass>
+                            <mainClass>OTMConnect</mainClass>
                         </manifest>
                         <manifestEntries>
                             <git-SHA-1>${buildNumber}</git-SHA-1>
