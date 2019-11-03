@@ -37,5 +37,3 @@ otm.run_simple(0,1500,[1,2,3],10)
 
 # always end by deleting the wrapper
 del otm
-
-

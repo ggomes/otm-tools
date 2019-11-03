@@ -1,9 +1,9 @@
 import error.OTMException;
+
 public class DemoRunStep {
 
     public static void main(String[] args) {
         try {
-
             float start_time = 0f;
             float duration = 3600f;
             float advance_time = 300f;
@@ -17,9 +17,9 @@ public class DemoRunStep {
             // run step-by-step using the 'advance' method
             float time = start_time;
             float end_time = start_time+duration;
+
             while(time<end_time){
                 System.out.println(time);
-
                 otm.advance(advance_time);
 
                 // Insert your code here -----
