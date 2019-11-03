@@ -1,8 +1,5 @@
-//import api.OTM;
 import error.OTMException;
-import output.AbstractOutput;
-import output.LinkFlow;
-import output.LinkVehicles;
+import output.*;
 import java.util.Set;
 
 public class DemoRun {

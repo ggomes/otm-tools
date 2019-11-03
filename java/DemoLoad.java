@@ -7,6 +7,5 @@ public class DemoLoad {
         } catch (Exception e) {
             System.err.print(e.getMessage());
         }
-	}
-        
+	}        
 }

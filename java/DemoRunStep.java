@@ -18,8 +18,7 @@ public class DemoRunStep {
             float time = start_time;
             float end_time = start_time+duration;
             while(time<end_time){
-
-		System.out.println(time);
+                System.out.println(time);
 
                 otm.advance(advance_time);
 
