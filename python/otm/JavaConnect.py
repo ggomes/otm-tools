@@ -11,7 +11,7 @@ from py4j.java_gateway import JavaGateway, GatewayParameters
 
 class JavaConnect():
 
-    def __init__(self, port_num = 25335, decomposition_flag = False):
+    def __init__(self, port_num = 25335):
 
         self.process = None
         self.pid = None
@@ -31,7 +31,8 @@ class JavaConnect():
             else:
                 raise Exception('Unknown platform')
 
-            self.gateway = JavaGateway(gateway_parameters=GatewayParameters(port=int(self.port_number)))
+            self.gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True,port=int(self.port_number)))
+            # self.gateway = JavaGateway(gateway_parameters=GatewayParameters(port=int(self.port_number)))
 
         else:
             print("Jar file missing")
@@ -56,7 +57,17 @@ class JavaConnect():
             sys.exit()
 
         # Here we wait for 0.5 sec to allow the java server to start
-        time.sleep(1)
+        time.sleep(0.4)
+
+    def to_int_set(self,pset):
+        # int_class = self.gateway.jvm.int
+        # int_array = self.gateway.new_array(int_class,2len(pset))
+
+        int_set = gateway.jvm.java.util.HashSet()
+
+        int_array[0] = 1
+        int_array[1] = 2
+        return int_array
 
     def close(self):
         if platform.system() == "Windows":

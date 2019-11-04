@@ -1,10 +1,6 @@
 import py4j.GatewayServer;
 import utils.OTMUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 public class OTMConnect {
 
 	public api.OTM otm;
