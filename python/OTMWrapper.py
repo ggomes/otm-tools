@@ -86,6 +86,12 @@ class OTMWrapper:
 		# run the simulation
 		self.otm.run(self.start_time,self.duration)
 
+	def initialize(self,start_time=0):
+		self.otm.initialize(start_time)
+
+	def advance(self,duration):
+		self.otm.advance(duration)
+
 	def get_state_trajectory(self):
 
 		X = {'time':None,'link_ids':None,'vehs':None,'flows_vph':None,'speed_kph':None}

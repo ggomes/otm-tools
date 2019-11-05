@@ -2,38 +2,30 @@ import os
 import inspect
 from OTMWrapper import OTMWrapper
 
-# define the input file
+start_time = 0.
+duration = 3600.
+advance_time = 300.
+
+# load the configuration file
 this_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 root_folder = os.path.dirname(this_folder)
 configfile = os.path.join(root_folder, 'configs', 'line.xml')
-
-# open the api
 otm = OTMWrapper(configfile)
 
-# # Plot the network
-# otm.show_network(10)
+# initialize (prepare/rewind the simulation)
+otm.initialize(start_time)
 
-# # Table of link information
-# X = otm.get_link_table
+# run step-by-step using the 'advance' method
+time = start_time
+end_time = start_time + duration
 
-# # All information in the configuration
-# X = otm.get_info()
+while(time<end_time):
+	otm.advance(advance_time)
 
-# run a simulation
-# otm.run_simple(start_time=0,duration=1500,request_links=[1,2,3],request_dt=10)
-otm.run_simple(0,1500,[1,2,3],10)
+	# Insert your code here -----
+	print(otm.otm.get_current_time())
 
-# # extract the state trajectory
-# Y = otm.get_state_trajectory;
-
-# # plot the state trajectory
-# figure
-# subplot(311)
-# plot(Y.time,Y.vehs)
-# subplot(312)
-# plot(Y.time(2:end),Y.flows_vph)
-# subplot(313)
-# plot(Y.time(2:end),Y.speed_kph)
+	time += advance_time;
 
 # always end by deleting the wrapper
 del otm

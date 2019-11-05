@@ -197,7 +197,6 @@ classdef OTMWrapper < handle
                 end
                 
             end
-            
         end
         
         function [X] = get_state_trajectory(this)
@@ -260,7 +259,6 @@ classdef OTMWrapper < handle
                 speed_kph(speed_kph>ffspeed_kph) = ffspeed_kph;
                 X.speed_kph(i,:) = speed_kph;
             end
-            
         end
         
 %         function [time,X] = get_state_trajectory(this,dt)
@@ -324,7 +322,7 @@ classdef OTMWrapper < handle
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % run a simulation
-        function [] = run_simple(this,start_time,duration,request_links,request_dt)
+        function run_simple(this,start_time,duration,request_links,request_dt)
             
             this.start_time = start_time;
             this.duration = duration;
@@ -341,11 +339,10 @@ classdef OTMWrapper < handle
             
             % run the simulation
             this.api.run( uint32(start_time), uint32(duration));
-            
         end
         
         % run a simulation
-        function [] = run_simulation(this,prefix,output_requests_file,output_folder,duration,start_time)
+        function run_simulation(this,prefix,output_requests_file,output_folder,duration,start_time)
             error('THIS METHOD IS NOT WORKING')
 
             if nargin<6
@@ -366,7 +363,20 @@ classdef OTMWrapper < handle
                 output_folder, ...
                 uint32(start_time), ...
                 uint32(duration));
-            
+        end
+
+        function initialize(this, start_time)
+            if nargin<1
+                start_time = 0;
+            end
+            this.api.initialize(start_time);
+        end
+
+        function advance(this, duration)
+            if nargin<2
+                error('Too few input arguments')
+            end
+            this.api.advance(duration)
         end
         
         % Get scenario information.
