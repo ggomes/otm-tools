@@ -1,5 +1,9 @@
 from otm.JavaConnect import JavaConnect
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+import matplotlib.colors as pltc
+from random import sample
 
 class OTMWrapper:
 
@@ -20,13 +24,54 @@ class OTMWrapper:
 		if self.conn is not None:
 			self.conn.close()
 
-	def show_network(self):
-		X = []
-		return X
+	def show_network(self,linewidth=1):
+		
+		fig, ax = plt.subplots()
 
-	def get_link_table(self):
-		X = []
-		return X
+		nodes = {}
+		for node_id in self.otm.scenario().get_node_ids():
+			node_info = self.otm.scenario().get_node_with_id(node_id)
+			nodes[node_id] = {'x':node_info.getX(),'y':node_info.getY()}
+
+		lines = []
+		minX = float('Inf')
+		maxX = -float('Inf')
+		minY = float('Inf')
+		maxY = -float('Inf')
+		for link_id in self.otm.scenario().get_link_ids():
+			link_info = self.otm.scenario().get_link_with_id(link_id)
+
+			start_point = nodes[link_info.getStart_node_id()]
+			end_point = nodes[link_info.getEnd_node_id()]
+
+			p0 = (start_point['x'],start_point['y'])
+			p1 = (end_point['x'],end_point['y'])
+			lines.append([p0,p1])
+
+			minX = min([minX,p0[0],p1[0]])
+			maxX = max([maxX,p0[0],p1[0]])
+			minY = min([minY,p0[1],p1[1]])
+			maxY = max([maxY,p0[1],p1[1]])
+
+		all_colors = [k for k,v in pltc.cnames.items()]
+		colors = sample(all_colors, len(lines))
+		lc = LineCollection(lines,colors=colors)
+		lc.set_linewidths(linewidth)
+		ax.add_collection(lc)
+
+		dY = maxY - minY
+		dX = maxX - minX
+
+		if(dY>dX):
+			ax.set_ylim((minY,maxY))
+			c = (maxX+minX)/2
+			ax.set_xlim((c-dY/2,c+dY/2))
+		else:
+			ax.set_xlim((minX,maxX))
+			c = (maxY+minY)/2
+			ax.set_ylim((c-dX/2,c+dX/2))
+
+		plt.draw()
 
 	# run a simulation
 	def run_simple(self,start_time=0.,duration=3600.,output_dt=30.):

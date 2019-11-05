@@ -12,17 +12,10 @@ configfile = os.path.join(root_folder, 'configs', 'line.xml')
 otm = OTMWrapper(configfile)
 
 # Plot the network
-otm.show_network
-
-# Table of link information
-X = otm.get_link_table
-
-# # All information in the configuration
-# X = otm.get_info()
+otm.show_network(4)
 
 # run a simulation
 otm.run_simple(start_time=0,duration=1500,output_dt=10)
-# otm.run_simple(0,1500,10)
 
 # extract the state trajectory
 Y = otm.get_state_trajectory()
@@ -40,7 +33,9 @@ plt.subplot(313)
 plt.plot(Y['time'],Y['speed_kph'].T)
 plt.ylabel("speed [kph]") 
 plt.legend(['link 1','link 2','link 3'])
-# ax.xlabel("time [sec]") 
+plt.xlabel("time [sec]") 
+plt.draw()
+
 plt.show()
 
 # always end by deleting the wrapper

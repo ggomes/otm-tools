@@ -31,8 +31,8 @@ class JavaConnect():
             else:
                 raise Exception('Unknown platform')
 
-            self.gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True,port=int(self.port_number)))
-            # self.gateway = JavaGateway(gateway_parameters=GatewayParameters(port=int(self.port_number)))
+            # self.gateway = JavaGateway(gateway_parameters=GatewayParameters(auto_convert=True,port=int(self.port_number)))
+            self.gateway = JavaGateway(gateway_parameters=GatewayParameters(port=int(self.port_number)))
 
         else:
             print("Jar file missing")
