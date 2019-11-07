@@ -16,7 +16,14 @@
         <developerConnection>scm:git:git@github.com:ggomes/otm-tools.git</developerConnection>
         <url>git@github.com:ggomes/otm-tools.git</url>
     </scm>
-    
+        
+    <repositories>
+        <repository>
+            <id>myMavenRepoOTM</id>
+            <url>${myMavenRepoOTMReadUrl}</url>
+        </repository>
+    </repositories>
+
     <build>
 
         <resources>
