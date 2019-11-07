@@ -12,9 +12,9 @@
     <url>http://maven.apache.org</url>
 
     <scm>
-        <connection>scm:git:git@github.com:ggomes/otm-py4j.git</connection>
-        <developerConnection>scm:git:git@github.com:ggomes/otm-py4j.git</developerConnection>
-        <url>git@github.com:ggomes/otm-py4j.git</url>
+        <connection>scm:git:git@github.com:ggomes/otm-tools.git</connection>
+        <developerConnection>scm:git:git@github.com:ggomes/otm-tools.git</developerConnection>
+        <url>git@github.com:ggomes/otm-tools.git</url>
     </scm>
     
     <build>
@@ -28,23 +28,23 @@
 
         <plugins>
 
-            <!-- version number -->
-<!--             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>create</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <revisionOnScmFailure>true</revisionOnScmFailure>
-                </configuration>
-            </plugin> -->
+        <!-- version number -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+                <execution>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>create</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <revisionOnScmFailure>true</revisionOnScmFailure>
+            </configuration>
+        </plugin>
 
             <!-- MAVEN COMPILER -->
             <plugin>
