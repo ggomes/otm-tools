@@ -327,15 +327,17 @@ classdef OTMWrapper < handle
             this.start_time = start_time;
             this.duration = duration;
             
-            if nargin>3
-                link_ids = java.util.HashSet
-            ;
+            if nargin<=3
+                link_ids = this.api.scenario().get_link_ids();
+            else
+                link_ids = java.util.HashSet;
                 for i=1:numel(request_links)
                     link_ids.add(java.lang.Long(request_links(i)));
                 end
-                this.api.output.request_links_flow([],link_ids, java.lang.Float(request_dt));
-                this.api.output.request_links_veh([],link_ids, java.lang.Float(request_dt));
             end
+            
+            this.api.output.request_links_flow([],link_ids, java.lang.Float(request_dt));
+            this.api.output.request_links_veh([],link_ids, java.lang.Float(request_dt));
             
             % run the simulation
             this.api.run( uint32(start_time), uint32(duration));
