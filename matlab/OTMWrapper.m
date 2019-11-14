@@ -336,6 +336,7 @@ classdef OTMWrapper < handle
                 end
             end
             
+            this.api.output.clear()
             this.api.output.request_links_flow([],link_ids, java.lang.Float(request_dt));
             this.api.output.request_links_veh([],link_ids, java.lang.Float(request_dt));
             

@@ -41,7 +41,7 @@ def __query_json(west=-122.2981,north=37.8790,east=-122.2547,south=37.8594):
     infrastructure = 'way["highway"]'
     timeout = 180
     osm_filter = '["area"!~"yes"]["motor_vehicle"!~"no"]["motorcar"!~"no"]["access"!~"private"]["service"!~"parking|parking_aisle|driveway|private|emergency_access"]'
-    if False:
+    if True:
         osm_filter = osm_filter + '["highway"!~"footway|bridleway|steps|path|living_street|service|pedestrian|track|bus_guideway|escape|raceway|cycleway|proposed|construction|bus_stop|crossing|elevator|emergency_access_point|give_way|mini_roundabout|motorway_junction|passing_place|rest_area|speed_camera|street_lamp|services|corridor|abandoned|platform"]'
     else:
         osm_filter = osm_filter + '["highway"!~"tertiary|unclassified|residential|tertiary_link|footway|bridleway|steps|path|living_street|service|pedestrian|track|bus_guideway|escape|raceway|cycleway|proposed|construction|bus_stop|crossing|elevator|emergency_access_point|give_way|mini_roundabout|motorway_junction|passing_place|rest_area|speed_camera|street_lamp|services|corridor|abandoned|platform"]'
@@ -898,11 +898,6 @@ def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
 
     # 1. query osm
     jsons = __query_json(west,north,east,south)
-
-    # with open('anchorage.pickle','wb') as file:
-    #     pickle.dump( jsons, file)
-    # with open('anchorage.pickle','rb') as file:
-    #     jsons=pickle.load(file)
 
     # 2. parse osm
     links, nodes = __parse_jsons(jsons,fixes)

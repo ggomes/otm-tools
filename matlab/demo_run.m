@@ -2,7 +2,8 @@
 import api.OTM
 
 % load the configuration file into an OTMWrapper object
-otm = OTMWrapper('../configs/line.xml');
+cd(fileparts(mfilename('fullpath')))
+otm = OTMWrapper('../configs/line_macro.xml');
 
 % Plot the network
 otm.show_network(10)

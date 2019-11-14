@@ -1,4 +1,4 @@
-import osm_query
+from . import osm_query
 from lxml import etree
 import pandas as pd
 
@@ -10,7 +10,7 @@ road_param_types = {
     'secondary':        {'id': 4, 'capacity': 2004, 'speed': 104, 'jam_density': 104},
 }
 
-class Loader:
+class OSMLoader:
 
     def __init__(self, cfg=''):
         self.config_file = cfg
@@ -33,10 +33,78 @@ class Loader:
 
         return pd.DataFrame(data={'id':link_ids,'length':link_lengths,'speed_kph':speed_kph,'travel_time':travel_time})
 
-    def join_links_shorter_than(self,min_length_meters):
-        pass
+    def join_links_shorter_than(self, min_length_meters):
 
-    def merge_nodes(self,merge_nodes):
+        while True:
+
+            # find a candidate link
+            short_links = [link for (linkid, link) in self.scenario['links'].items() if
+                           link['length'] < min_length_meters and
+                           ( len(self.scenario['nodes'][link['start_node_id']]['in_links'])==1 or
+                           len(self.scenario['nodes'][link['end_node_id']]['out_links']) == 1 ) ]
+
+            if len(short_links)==0:
+                break
+
+            foundone = False
+            for short_link in short_links:
+
+                start_node = self.scenario['nodes'][short_link['start_node_id']]
+                end_node = self.scenario['nodes'][short_link['end_node_id']]
+
+                # check the upstream link
+                if len(start_node['in_links'])==1:
+                    merge_link = self.scenario['links'][next(iter(start_node['in_links']))]
+
+                    # merge if they have the same number of lanes
+                    if merge_link['lanes']==short_link['lanes']:
+
+                        merge_link['length'] = merge_link['length'] + short_link['length']
+                        merge_link['end_node_id'] = short_link['end_node_id']
+                        merge_link['nodes'] = merge_link['nodes'] + short_link['nodes'][1:]
+                        del self.scenario['links'][short_link['id']]
+
+                        if short_link['id'] in end_node['in_links']:
+                            end_node['in_links'].remove(short_link['id'])
+
+                        start_node['in_links'] = set()
+                        start_node['out_links'] = set()
+                        end_node['in_links'].add(merge_link['id'])
+                        if start_node['id'] in self.scenario['external_nodes']:
+                            self.scenario['external_nodes'].remove(start_node['id'])
+                        self.scenario['internal_nodes'].add(start_node['id'])
+                        foundone = True
+                        break
+
+                # check the downstream link
+                else:
+                    merge_link = self.scenario['links'][next(iter(end_node['out_links']))]
+
+                    # merge if they have the same number of lanes
+                    if merge_link['lanes']==short_link['lanes']:
+                        merge_link['length'] = merge_link['length'] + short_link['length']
+                        merge_link['start_node_id'] = short_link['start_node_id']
+                        merge_link['nodes'] = short_link['nodes'] + merge_link['nodes'][1:]
+                        del self.scenario['links'][short_link['id']]
+
+                        if short_link['id'] in start_node['out_links']:
+                            start_node['out_links'].remove(short_link['id'])
+                        end_node['in_links'] = set()
+                        end_node['out_links'] = set()
+                        start_node['out_links'].add(merge_link['id'])
+                        if end_node['id'] in self.scenario['external_nodes']:
+                            self.scenario['external_nodes'].remove(end_node['id'])
+                        self.scenario['internal_nodes'].add(end_node['id'])
+                        foundone = True
+                        break
+
+            # if you go through all short_links and find nothing, then quit
+            if not foundone:
+                break
+
+        print(len(self.scenario['links']))
+
+    def merge_nodes(self, merge_nodes):
 
         # checks ...............
         for merge_node in merge_nodes:
@@ -56,6 +124,7 @@ class Loader:
     def save_to_xml(self, outfile):
 
         scenario=etree.Element('scenario')
+        scenario.set('xmlns','opentrafficmodels')
         etree.SubElement(scenario,'commodities')
         models = etree.SubElement(scenario, 'models')
         model = etree.SubElement(models,'model',{'type':'ctm','name':'myctm','is_default':'true'})
@@ -63,10 +132,10 @@ class Loader:
 
         # vehicle types ............................
         commodities=next(scenario.iter('commodities'))
-        etree.SubElement(commodities,'commodity',{'id':'0','name':'type0','pathfull':'false'})
+        etree.SubElement(commodities, 'commodity', {'id':'0','name':'type0','pathfull':'false'})
 
         # network ..................................
-        network=etree.SubElement(scenario,'network')
+        network=etree.SubElement(scenario, 'network')
 
         # road params ..............................
         road_params=etree.SubElement(network,'roadparams')
@@ -148,9 +217,7 @@ class Loader:
             if node['type']=='traffic_signals':
 
                 in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
-
                 road_conns = [road_conn for road_conn in self.scenario['road_conns'] if road_conn['in_link'] in node['in_links']]
-
 
                 ### FIGURE OUT PHASES / ROAD CONNECTIONS
 
