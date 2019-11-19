@@ -16,7 +16,7 @@ class OSMLoader:
         self.config_file = cfg
         self.scenario = {}
 
-    def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,fixes={},simplify_roundabouts=False):
+    def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,fixes={},simplify_roundabouts=False,positions_in_meters=False):
         self.scenario = osm_query.load_from_osm(west=west,north=north,east=east,south=south,fixes=fixes,simplify_roundabouts=simplify_roundabouts)
 
     def get_link_table(self):
@@ -149,22 +149,28 @@ class OSMLoader:
 
         # get all node positions ......................
         # node_id_map={}
-        node_set=etree.SubElement(network,'nodes')
-        node_id=0
+        if self.positions_in_meters:
+            gps_or_meters = 'meters'
+            format = '{:.2f}'
+        else:
+            gps_or_meters = 'gps'
+            format = '{:f}'
+        node_set = etree.SubElement(network, 'nodes', {'gps_or_meters': gps_or_meters})
+        node_id = 0
         for node_osmid in self.scenario['external_nodes']:
             node = self.scenario['nodes'][node_osmid]
             # node_id_map[node['id']]=node_osmid
-            etree.SubElement(node_set,'node',{
-                'id':str(node_osmid),
-                'x':'{:.2f}'.format(node['x']),
-                'y':'{:.2f}'.format(node['y'])
+            etree.SubElement(node_set, 'node', {
+                'id': str(node_osmid),
+                'x': format.format(node['x']),
+                'y': format.format(node['y'])
             })
             node_id+=1
 
-        link_id_map={}
-        link_set=etree.SubElement(network,'links')
-        link_id=0
-        for link_osmid,link in self.scenario['links'].items():
+        link_id_map = {}
+        link_set = etree.SubElement(network,'links')
+        link_id = 0
+        for link_osmid, link in self.scenario['links'].items():
             link_id_map[str(link['id'])]=link_id
 
             if link['start_node_id'] not in self.scenario['nodes'].keys():
@@ -187,8 +193,8 @@ class OSMLoader:
             for node_id in link['nodes']:
                 node=self.scenario['nodes'][node_id]
                 etree.SubElement(epoints,'point',{
-                    'x':'{:.2f}'.format(node['x']),
-                    'y':'{:.2f}'.format(node['y'])
+                    'x': format.format(node['x']),
+                    'y': format.format(node['y'])
                 })
 
         # road connections ....................................

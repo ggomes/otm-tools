@@ -3,7 +3,7 @@ import pickle
 
 osmtool = OSMLoader()
 osmtool.load_from_osm(
-    west=-122.2981, north=37.8790, east=-122.2547, south=37.8594, #south=37.8594,
+    west=-122.2981, north=37.8790, east=-122.2547, south=37.8594,
     simplify_roundabouts=True,
     fixes={
         # turns: left | | | lanes 3
@@ -36,10 +36,10 @@ osmtool.load_from_osm(
 # with open('berkeley.pickle','rb') as file:
 #     otm=pickle.load(file)
 
-osmtool.join_links_shorter_than(50.0)
+# osmtool.join_links_shorter_than(50.0)
 # osmtool.merge_nodes([243670960, 53085601, 243670958])
 # osmtool.merge_nodes([243670957, 53085641, 243670955])
 
-osmtool.save_to_xml('berkeley2.xml')
+osmtool.save_to_xml('berkeley_gps.xml')
 
 print('DONE')

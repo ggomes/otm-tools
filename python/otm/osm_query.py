@@ -5,7 +5,6 @@ import geopandas as gpd
 from shapely.geometry import MultiPolygon
 from shapely.geometry import Polygon
 import requests
-import pickle
 from statistics import mean
 
 MilesToKilometers = 1.609344
@@ -204,8 +203,8 @@ def __parse_jsons(jsons,fixes):
         else:
             print('unknown')
 
-    max_link_id=max([x for x in links.keys()])+1
-    max_node_id=max([x for x in nodes.keys()])+1
+    max_link_id = max([x for x in links.keys()])+1
+    max_node_id = max([x for x in nodes.keys()])+1
 
     # set in and out links
     for node_id,node in nodes.items():
@@ -761,18 +760,20 @@ def __latlong2meters(lat, lon, clat, clon):
 
     return dx, dy
 
-def __convert_latlon_to_meters(nodes):
+def __compute_lengths(links,nodes):
+
+    node_meters = {}
+
     centroid = np.mean([[v['x'], v['y']] for v in nodes.values()], axis=0)
     for node_id, node in nodes.items():
         dx, dy = __latlong2meters(node['y'], node['x'], centroid[1], centroid[0])
-        node['x'] = dx
-        node['y'] = dy
+        node_meters[node_id] = (dx, dy)
 
-def __compute_link_lengths(links, nodes):
     for link in links.values():
-        start_node = nodes[link['start_node_id']]
-        end_node = nodes[link['end_node_id']]
-        link['length'] = math.sqrt( math.pow(end_node['x']-start_node['x'],2) + math.pow(end_node['y']-start_node['y'],2) )
+        start_node = node_meters[link['start_node_id']]
+        end_node = node_meters[link['end_node_id']]
+        link['length'] = math.sqrt( math.pow(end_node[0]-start_node[0],2) + math.pow(end_node[1]-start_node[1],2) )
+
 
 # ROAD CONNECTIONS ---------------------------------
 
@@ -897,41 +898,40 @@ def __create_road_connections(links, nodes):
 def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
 
     # 1. query osm
-    jsons = __query_json(west,north,east,south)
+    jsons = __query_json(west, north, east, south)
 
     # 2. parse osm
-    links, nodes = __parse_jsons(jsons,fixes)
+    links, nodes = __parse_jsons(jsons, fixes)
 
-    __remove_P_shaped_links(links,nodes)
+    __remove_P_shaped_links(links, nodes)
 
     # 3. split links when
     #    a) they cross another street at an internal node,
     #    b) they contain an traffic signal at an internal node
-    internal_nodes, external_nodes = __split_streets(links,nodes)
+    internal_nodes, external_nodes = __split_streets(links, nodes)
 
     if simplify_roundabouts:
         __simplify_roundabouts(links, nodes, external_nodes)
 
     # 4. eliminate simple external nodes
-    __eliminate_simple_external_nodes(links,nodes,internal_nodes, external_nodes)
+    __eliminate_simple_external_nodes(links, nodes, internal_nodes, external_nodes)
 
     # 5. flip and expand links
     __flip_wrong_way_links(links)
 
     __expand_bidirectional_links(links)
 
-    # 6. link and node locations
-    __convert_latlon_to_meters(nodes)
-    __compute_link_lengths(links,nodes)
+    # 6. link lengths
+    __compute_lengths(links, nodes)
 
     # 7. create road connections
     road_conns = __create_road_connections(links, nodes)
 
-    return {'links' : links,
-            'nodes' : nodes,
-            'road_conns' : road_conns,
-            'internal_nodes' : internal_nodes,
-            'external_nodes' : external_nodes }
+    return {'links': links,
+            'nodes': nodes,
+            'road_conns': road_conns,
+            'internal_nodes': internal_nodes,
+            'external_nodes': external_nodes}
 
     # # demands
     # source_links = get_source_links(graph)
