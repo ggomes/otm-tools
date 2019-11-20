@@ -188,6 +188,7 @@ def __parse_jsons(jsons,fixes):
         elements.extend(json['elements'])
 
     # extract nodes and paths from the downloaded osm data
+    print('\textract nodes and paths from the downloaded osm data')
     links = {}
     nodes = {}
     for element in elements:
@@ -207,6 +208,7 @@ def __parse_jsons(jsons,fixes):
     max_node_id = max([x for x in nodes.keys()])+1
 
     # set in and out links
+    print('\tset in and out links')
     for node_id, node in nodes.items():
         node['out_links'] = set([link_id for link_id, link in links.items() if link['start_node_id']==node_id])
         node['in_links'] = set([link_id for link_id, link in links.items() if link['end_node_id']==node_id])
@@ -902,9 +904,11 @@ def __create_road_connections(links, nodes):
 def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
 
     # 1. query osm
+    print('1. query osm')
     jsons = __query_json(west, north, east, south)
 
     # 2. parse osm
+    print('2. parse osm')
     links, nodes = __parse_jsons(jsons, fixes)
 
     __remove_P_shaped_links(links, nodes)
@@ -912,23 +916,28 @@ def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
     # 3. split links when
     #    a) they cross another street at an internal node,
     #    b) they contain an traffic signal at an internal node
+    print('3. split links when')
     internal_nodes, external_nodes = __split_streets(links, nodes)
 
     if simplify_roundabouts:
         __simplify_roundabouts(links, nodes, external_nodes)
 
     # 4. eliminate simple external nodes
+    print('4. eliminate simple external nodes')
     __eliminate_simple_external_nodes(links, nodes, internal_nodes, external_nodes)
 
     # 5. flip and expand links
+    print('. flip and expand links')
     __flip_wrong_way_links(links)
 
     __expand_bidirectional_links(links, nodes)
 
     # 6. link lengths
+    print('6. link lengths')
     __compute_lengths(links, nodes)
 
     # 7. create road connections
+    print('7. create road connections')
     road_conns = __create_road_connections(links, nodes)
 
     return {'links': links,

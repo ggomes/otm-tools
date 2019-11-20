@@ -10,8 +10,6 @@ osmtool.load_from_osm(
     simplify_roundabouts=False
 )
 
-#37+(52/60)+(47.37/3600),
-
 # X = osmtool.get_link_table()
 # X.sort_values(by='travel_time', ascending=True, inplace=True)
 # print(X)

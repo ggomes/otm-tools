@@ -1,9 +1,9 @@
-from osm2otm import Loader
-import pandas as pd
+from otm.OSMLoader import OSMLoader
+import pickle
 
 # north=61.2597,south=61.0672,east=-149.6302,west=-150.0446,
 
-osmtool = Loader()
+osmtool = OSMLoader()
 osmtool.load_from_osm(
     north=61.2597,south=61.0672,east=-149.6302,west=-150.0446,
     simplify_roundabouts=False,
