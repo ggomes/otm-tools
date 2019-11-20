@@ -207,9 +207,9 @@ def __parse_jsons(jsons,fixes):
     max_node_id = max([x for x in nodes.keys()])+1
 
     # set in and out links
-    for node_id,node in nodes.items():
-        node['out_links']=set([link_id for link_id,link in links.items() if link['start_node_id']==node_id])
-        node['in_links']=set([link_id for link_id,link in links.items() if link['end_node_id']==node_id])
+    for node_id, node in nodes.items():
+        node['out_links'] = set([link_id for link_id, link in links.items() if link['start_node_id']==node_id])
+        node['in_links'] = set([link_id for link_id, link in links.items() if link['end_node_id']==node_id])
 
     return links, nodes
 
@@ -712,7 +712,7 @@ def __flip_wrong_way_links(links):
     for link in links.values():
         del link['flip']
 
-def __expand_bidirectional_links(links):
+def __expand_bidirectional_links(links, nodes):
 
     bi_links = [link for link in links.values() if link['bidirectional']]
 
@@ -736,6 +736,10 @@ def __expand_bidirectional_links(links):
 
         # add to links
         links[backward_link['id']] = backward_link
+
+        # add to nodes
+        nodes[end_node_id]['out_links'].add(backward_link['id'])
+        nodes[start_node_id]['in_links'].add(backward_link['id'])
 
     # remove backward attributes
     for link in links.values():
@@ -816,9 +820,9 @@ def __create_road_connections(links, nodes):
         for next_link in next_links:
             from_node = nodes[next_link['nodes'][0]]
             to_node = nodes[next_link['nodes'][1]]
-            d_out = __find_direction(from_node,to_node)
-            relative_angle.append( ( next_link['id'] , d_out-d_in ) )
-        relative_angle = sorted(relative_angle,key=lambda x:x[1])
+            d_out = __find_direction(from_node, to_node)
+            relative_angle.append((next_link['id'], d_out-d_in))
+        relative_angle = sorted(relative_angle, key=lambda x: x[1])
 
         # extract all of the turns we have
         turn_lanes = link['turn_lanes'].split('|')
@@ -833,29 +837,29 @@ def __create_road_connections(links, nodes):
                     turn_to_lanes[t] = [i+1]
 
         if 'left' in turn_to_lanes:
-            road_conns.append({'in_link':link['id'],
+            road_conns.append({'in_link': link['id'],
                               'in_lanes': turn_to_lanes['left'],
                               'out_link': relative_angle[0][0],
-                              'out_lanes':[],
+                              'out_lanes': [],
                               'direction' : 'left'})
             next_links.remove(links[relative_angle[0][0]])
             del relative_angle[0]
 
         if 'right' in turn_to_lanes:
-            road_conns.append({'in_link':link['id'],
-                               'in_lanes':turn_to_lanes['right'],
-                               'out_link':relative_angle[len(relative_angle)-1][0],
-                               'out_lanes':[],
+            road_conns.append({'in_link': link['id'],
+                               'in_lanes': turn_to_lanes['right'],
+                               'out_link': relative_angle[len(relative_angle)-1][0],
+                               'out_lanes': [],
                               'direction' : 'right'})
             next_links.remove(links[relative_angle[len(relative_angle)-1][0]])
             del relative_angle[len(relative_angle)-1]
 
 
         if ('through' in turn_to_lanes) and len(relative_angle)==1:
-            road_conns.append({'in_link':link['id'],
-                               'in_lanes':turn_to_lanes['through'],
-                               'out_link':relative_angle[0][0],
-                               'out_lanes':[],
+            road_conns.append({'in_link': link['id'],
+                               'in_lanes': turn_to_lanes['through'],
+                               'out_link': relative_angle[0][0],
+                               'out_lanes': [],
                               'direction' : 'through'})
             next_links.remove(links[relative_angle[0][0]])
             del relative_angle[0]
@@ -919,7 +923,7 @@ def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
     # 5. flip and expand links
     __flip_wrong_way_links(links)
 
-    __expand_bidirectional_links(links)
+    __expand_bidirectional_links(links, nodes)
 
     # 6. link lengths
     __compute_lengths(links, nodes)

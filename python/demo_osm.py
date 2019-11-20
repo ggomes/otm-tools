@@ -36,10 +36,14 @@ osmtool.load_from_osm(
 # with open('berkeley.pickle','rb') as file:
 #     otm=pickle.load(file)
 
-# osmtool.join_links_shorter_than(50.0)
+
+osmtool.join_links_shorter_than(500.0)
+
+# link = osmtool.scenario['links'][25315496]
+
 # osmtool.merge_nodes([243670960, 53085601, 243670958])
 # osmtool.merge_nodes([243670957, 53085641, 243670955])
 
-osmtool.save_to_xml('berkeley_gps.xml')
+osmtool.save_to_xml('berkeley_simp.xml')
 
 print('DONE')

@@ -40,10 +40,10 @@ class OSMLoader:
             # find a candidate link
             short_links = [link for (linkid, link) in self.scenario['links'].items() if
                            link['length'] < min_length_meters and
-                           ( len(self.scenario['nodes'][link['start_node_id']]['in_links'])==1 or
-                           len(self.scenario['nodes'][link['end_node_id']]['out_links']) == 1 ) ]
+                           ( len(self.scenario['nodes'][link['start_node_id']]['in_links']) == 1 or
+                           len(self.scenario['nodes'][link['end_node_id']]['out_links']) == 1)]
 
-            if len(short_links)==0:
+            if len(short_links) == 0:
                 break
 
             foundone = False
@@ -53,48 +53,66 @@ class OSMLoader:
                 end_node = self.scenario['nodes'][short_link['end_node_id']]
 
                 # check the upstream link
-                if len(start_node['in_links'])==1:
+                if len(start_node['in_links']) == 1 and len(start_node['out_links']) == 1:
                     merge_link = self.scenario['links'][next(iter(start_node['in_links']))]
 
                     # merge if they have the same number of lanes
-                    if merge_link['lanes']==short_link['lanes']:
+                    merge_ok = merge_link['lanes']==short_link['lanes']
 
+                    if merge_ok:
+
+                        # adjust attributes of the upstream (merge) link
                         merge_link['length'] = merge_link['length'] + short_link['length']
                         merge_link['end_node_id'] = short_link['end_node_id']
                         merge_link['nodes'] = merge_link['nodes'] + short_link['nodes'][1:]
-                        del self.scenario['links'][short_link['id']]
 
-                        if short_link['id'] in end_node['in_links']:
-                            end_node['in_links'].remove(short_link['id'])
+                        # delete the short link
+                        self.__delete_link(short_link['id'])
 
+                        # add upstream (merge) link to end node
+                        end_node['in_links'].add(merge_link['id'])
+
+                        # clear inputs and outputs of start node
                         start_node['in_links'] = set()
                         start_node['out_links'] = set()
-                        end_node['in_links'].add(merge_link['id'])
+
+                        # start node goes from external to internal
                         if start_node['id'] in self.scenario['external_nodes']:
                             self.scenario['external_nodes'].remove(start_node['id'])
                         self.scenario['internal_nodes'].add(start_node['id'])
+
                         foundone = True
                         break
 
                 # check the downstream link
-                else:
+                if len(end_node['in_links']) == 1 and len(end_node['out_links']) == 1:
                     merge_link = self.scenario['links'][next(iter(end_node['out_links']))]
 
                     # merge if they have the same number of lanes
-                    if merge_link['lanes']==short_link['lanes']:
+                    merge_ok = merge_link['lanes']==short_link['lanes']
+
+                    if merge_ok:
+
+                        # adjust attributes of the downstream (merge) link
                         merge_link['length'] = merge_link['length'] + short_link['length']
                         merge_link['start_node_id'] = short_link['start_node_id']
                         merge_link['nodes'] = short_link['nodes'] + merge_link['nodes'][1:]
-                        del self.scenario['links'][short_link['id']]
 
-                        if short_link['id'] in start_node['out_links']:
-                            start_node['out_links'].remove(short_link['id'])
+                        # delete the short link
+                        self.__delete_link(short_link['id'])
+
+                        # add downstream (merge) link to end node
+                        start_node['out_links'].add(merge_link['id'])
+
+                        # clear inputs and outputs of end node
                         end_node['in_links'] = set()
                         end_node['out_links'] = set()
-                        start_node['out_links'].add(merge_link['id'])
+
+                        # end node goes from external to internal
                         if end_node['id'] in self.scenario['external_nodes']:
                             self.scenario['external_nodes'].remove(end_node['id'])
                         self.scenario['internal_nodes'].add(end_node['id'])
+
                         foundone = True
                         break
 
@@ -131,47 +149,41 @@ class OSMLoader:
         etree.SubElement(model,'model_params',{'sim_dt':'2','max_cell_length':'100'})
 
         # vehicle types ............................
-        commodities=next(scenario.iter('commodities'))
-        etree.SubElement(commodities, 'commodity', {'id':'0','name':'type0','pathfull':'false'})
+        commodities = next(scenario.iter('commodities'))
+        etree.SubElement(commodities, 'commodity', {'id': '0', 'name': 'type0', 'pathfull': 'false'})
 
         # network ..................................
-        network=etree.SubElement(scenario, 'network')
+        network = etree.SubElement(scenario, 'network')
 
         # road params ..............................
-        road_params=etree.SubElement(network,'roadparams')
+        road_params = etree.SubElement(network, 'roadparams')
         for road_type_name,road_type_params in road_param_types.items():
-            etree.SubElement(road_params,'roadparam',{
-                'id':str(road_type_params['id']),
-                'capacity':str(road_type_params['capacity']),
-                'speed':str(road_type_params['speed']),
-                'jam_density':str(road_type_params['jam_density'])
+            etree.SubElement(road_params, 'roadparam', {
+                'id': str(road_type_params['id']),
+                'capacity': str(road_type_params['capacity']),
+                'speed': str(road_type_params['speed']),
+                'jam_density': str(road_type_params['jam_density'])
             })
 
         # get all node positions ......................
         # node_id_map={}
-        if self.positions_in_meters:
-            gps_or_meters = 'meters'
-            format = '{:.2f}'
-        else:
-            gps_or_meters = 'gps'
-            format = '{:f}'
-        node_set = etree.SubElement(network, 'nodes', {'gps_or_meters': gps_or_meters})
+        node_set = etree.SubElement(network, 'nodes', {'gps_or_meters': 'gps'})
         node_id = 0
         for node_osmid in self.scenario['external_nodes']:
             node = self.scenario['nodes'][node_osmid]
             # node_id_map[node['id']]=node_osmid
             etree.SubElement(node_set, 'node', {
                 'id': str(node_osmid),
-                'x': format.format(node['x']),
-                'y': format.format(node['y'])
+                'x': '{:f}'.format(node['x']),
+                'y': '{:f}'.format(node['y'])
             })
-            node_id+=1
+            node_id += 1
 
         link_id_map = {}
-        link_set = etree.SubElement(network,'links')
+        link_set = etree.SubElement(network, 'links')
         link_id = 0
         for link_osmid, link in self.scenario['links'].items():
-            link_id_map[str(link['id'])]=link_id
+            link_id_map[str(link['id'])] = link_id
 
             if link['start_node_id'] not in self.scenario['nodes'].keys():
                 print('ERROR: link[start_node_id] not in nodes.keys()')
@@ -179,48 +191,52 @@ class OSMLoader:
             if link['end_node_id'] not in self.scenario['nodes'].keys():
                 print('ERROR: link[end_node_id] not in nodes.keys()')
 
-            elink=etree.SubElement(link_set,'link',{
-                'id':str(link_osmid),
-                'length':'{:.2f}'.format(link['length']),  # WHAT UNITS IS THIS IN?
-                'full_lanes':str(link['lanes']),  # HOW TO GET THE LANES?
-                'start_node_id':str(link['start_node_id']),
-                'end_node_id':str(link['end_node_id']),
-                'roadparam':str(link['roadparam'])
+            elink=etree.SubElement(link_set, 'link', {
+                'id': str(link_osmid),
+                'length': '{:.2f}'.format(link['length']),  # WHAT UNITS IS THIS IN?
+                'full_lanes': str(link['lanes']),  # HOW TO GET THE LANES?
+                'start_node_id': str(link['start_node_id']),
+                'end_node_id': str(link['end_node_id']),
+                'roadparam': str(link['roadparam'])
             })
-            link_id+=1
+            link_id += 1
 
-            epoints=etree.SubElement(elink,'points')
+            epoints = etree.SubElement(elink,'points')
             for node_id in link['nodes']:
-                node=self.scenario['nodes'][node_id]
-                etree.SubElement(epoints,'point',{
-                    'x': format.format(node['x']),
-                    'y': format.format(node['y'])
+                node= self.scenario['nodes'][node_id]
+                etree.SubElement(epoints, 'point', {
+                    'x': '{:f}'.format(node['x']),
+                    'y': '{:f}'.format(node['y'])
                 })
 
         # road connections ....................................
-        rc_id=0
-        roadconnections=etree.SubElement(network,'roadconnections')
+        rc_id = 0
+        roadconnections = etree.SubElement(network, 'roadconnections')
 
         for road_conn in self.scenario['road_conns']:
-            rc=etree.SubElement(roadconnections,'roadconnection',{
-                'id':str(rc_id),
-                'in_link':str(road_conn['in_link']),
-                'out_link':str(road_conn['out_link']),
+            rc=etree.SubElement(roadconnections, 'roadconnection', {
+                'id': str(rc_id),
+                'in_link': str(road_conn['in_link']),
+                'out_link': str(road_conn['out_link']),
             })
             if 'in_link_lanes' in road_conn:
-                rc['in_link_lanes']='{}#{}'.format(min(road_conn['in_link_lanes']),max(road_conn['in_link_lanes']))
+                rc['in_link_lanes'] = '{}#{}'.format(min(road_conn['in_link_lanes']), max(road_conn['in_link_lanes']))
             if 'out_link_lanes' in road_conn:
-                rc['out_link_lanes']='{}#{}'.format(min(road_conn['out_link_lanes']),max(road_conn['out_link_lanes']))
-            rc_id+=1
+                rc['out_link_lanes'] = '{}#{}'.format(min(road_conn['out_link_lanes']), max(road_conn['out_link_lanes']))
+            rc_id += 1
 
         # actuators .............................
-        actuators=etree.SubElement(scenario,'actuators')
+        actuators = etree.SubElement(scenario, 'actuators')
 
         # nodes_with_signals = [node for node in self.scenario['nodes'].values() if node['type']=='traffic_signals']
         actuator_id = 0
         for node in self.scenario['nodes'].values():
 
             if node['type']=='traffic_signals':
+
+                if node['id'] not in self.scenario['external_nodes']:
+                    print("Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
+                    continue
 
                 in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
                 road_conns = [road_conn for road_conn in self.scenario['road_conns'] if road_conn['in_link'] in node['in_links']]
@@ -232,6 +248,11 @@ class OSMLoader:
                 signal = etree.SubElement(actuator,'signal')
 
             if node['type']=='stop':
+
+                if node['id'] not in self.scenario['external_nodes']:
+                    print("Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
+                    continue
+
                 actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'stop'})
                 etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
 
@@ -249,5 +270,24 @@ class OSMLoader:
         #     subnetwork = SubElement(subnetworks, 'subnetwork', {'id': str(subnet_id)})
         #     subnetwork.text = ','.join([str(i) for i in subnet_links])
 
-        with open(outfile,'wb') as xml_file:
-            xml_file.write(etree.tostring(scenario,pretty_print=True))
+        with open(outfile, 'wb') as xml_file:
+            xml_file.write(etree.tostring(scenario, pretty_print=True))
+
+    def __delete_link(self,link_id):
+
+        link = self.scenario['links'][link_id]
+
+        # remove link from start node
+        node = self.scenario['nodes'][link['start_node_id']]
+        if link_id in node['out_links']:
+            node['out_links'].remove(link_id)
+
+        # remove link from end node
+        node = self.scenario['nodes'][link['end_node_id']]
+        if link_id in node['in_links']:
+            node['in_links'].remove(link_id)
+
+        # remove exiting road connections
+        self.scenario['road_conns'] = [rc for rc in self.scenario['road_conns'] if rc['in_link']!=link_id and rc['out_link']!=link_id]
+
+        del self.scenario['links'][link_id]
