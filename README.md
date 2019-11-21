@@ -1,29 +1,51 @@
 # otm-tools
 Tools for Open Traffic Models
 
-# INSTALLATION #
+# Installation #
 
-**Step 1.** Install [JAVA 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your computer.
-See how to check your current version of JAVA [here](https://www.java.com/en/download/help/version_manual.xml).
-
-**Step 2.** Obtain the OTM simulator jar file. Either build it from the [code](https://github.com/ggomes/otm-sim) or download it [here](https://mymavenrepo.com/repo/XtcMAROnIu3PyiMCmbdY/edu/berkeley/ucbtrans/otm-sim/1.0-SNAPSHOT/)
-
-**Step 3.** Download the otm-tools repository to your computer. 
-
-**Step 4. (Matlab)** Point Matlab to Java 8. The current version of Matlab uses Java 7, however OTM requires Java 8. Follow these instructions to fix this: 
-
-* **MacOS** - Create an environment variable called `MATLAB_JAVA` in `~/.bash_profile` and set it equal to the full path of your Java installation's JRE folder. You can do so by adding the below line of code to `~/.bash_profile`, making any necessary changes to fit your computer:
+**1.** OTM works with Java 11.0.5 or later. Check your Java version:
 ```BASH
-export MATLAB_JAVA="/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre"
+java -version
 ```
-Note: You will only be able to use Matlab + Java 8 by opening the Matlab app via Terminal. If you open Matlab from the GUI, it will run with Java 7. <br><br>To check which version of Java your Matlab session is using, type into Matlab's command line prompt: `version -java`
+If needed, go [here to install Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html).
 
-* [**Windows**](https://www.mathworks.com/matlabcentral/answers/130359-how-do-i-change-the-java-virtual-machine-jvm-that-matlab-is-using-on-windows) 
+**2.** Obtain the OTM jar file. Follow [these instructions](https://ggomes.github.io/otm-sim/installation.html) to either build the OTM jar file or download it.
 
-* [**Linux**](https://www.mathworks.com/matlabcentral/answers/130360-how-do-i-change-the-java-virtual-machine-jvm-that-matlab-is-using-for-linux)
+**3.** Download or clone the `otm-tools` repository to your computer. 
 
-**Step 5. (Matlab)** Point Matlab to the OTM jar file. Follow these [instructions](https://www.mathworks.com/help/matlab/matlab_external/static-path.html) to include the OTM jar file in Matlab's static class path. You will need to restart Matlab after doing this. 
+## Python ##
 
-**Step 6. (Matlab)** Add otm-tools/matlab **with subfolders** to Matlab's path. See instructions [here](https://www.mathworks.com/help/matlab/matlab_env/add-remove-or-reorder-folders-on-the-search-path.html). 
+**1.** `otm-tools` uses py4j to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. Tou will need Apache Maven to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
 
-**Step 7. (Matlab)** Run otm-tools/matlab/sample_script.m. If this runs without error, you have succeeded in installing the package.
+**2.** Test your Maven installation:
+```BASH
+mvn -v
+```
+
+**3.** Copy `otm-tools/setting.xml` to `~/.m2`. If you do not have a folder called `.m2` in your home directory, then run the `mvn` command to create it.
+
+**4.** Build the py4j connector. From `otm-tools/python` folder, run 
+```BASH
+python setup.py develop
+```
+
+**5.** Test the installation. Run one of the demos. For example, `demo_run.py` should generate two plots.
+```BASH
+python run_demo.py
+```
+
+These steps require the following Python packages: `py4j`,`numpy`,`matplotlib`.
+
+## Matlab ##
+
+**1.** Change Matlab's Java version to 11.0.5. This is done by setting the `MATLAB_JAVA` environment variable to the full path of the Java 11 folder. For example, on Linux `echo $MATLAB_JAVA` might return
+```BASH
+/usr/lib/jvm/jdk-11.0.5
+```
+Here are some additional links on this topic: [MacOS](https://www.mathworks.com/matlabcentral/answers/103056-how-do-i-change-the-java-virtual-machine-jvm-that-matlab-is-using-on-macos), [Windows](https://www.mathworks.com/matlabcentral/answers/130359-how-do-i-change-the-java-virtual-machine-jvm-that-matlab-is-using-on-windows), [Linux](https://www.mathworks.com/matlabcentral/answers/130360-how-do-i-change-the-java-virtual-machine-jvm-that-matlab-is-using-for-linux).
+
+**2.** Point Matlab to the OTM jar file. Follow these [instructions](https://www.mathworks.com/help/matlab/matlab_external/static-path.html) to include the OTM jar file in Matlab's static class path. You will need to restart Matlab after doing this. 
+
+**3.** Add `otm-tools/matlab` (with subfolders) to Matlab's path. See instructions [here](https://www.mathworks.com/help/matlab/matlab_env/add-remove-or-reorder-folders-on-the-search-path.html). 
+
+**4.** Run `otm-tools/matlab/sample_script.m`. If this runs without error, you have succeeded in installing the package.
