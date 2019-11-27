@@ -16,6 +16,7 @@ classdef ScenarioBuilder < handle
             this.X = ScenarioBuilder.build_structs;
             
             % initialize the scenario
+            this.s.scenario.ATTRIBUTE.xmlns='opentrafficmodels';
             this.s.scenario.network = struct( ...
                 'links',[], ...
                 'nodes',[], ...
@@ -23,7 +24,9 @@ classdef ScenarioBuilder < handle
                 'roadconnections',[], ...
                 'roadparams',[] ...
                 );
+
             this.s.scenario.network.nodes.node = repmat(this.X.node_struct,1,0);
+            this.s.scenario.network.nodes.ATTRIBUTE.gps_or_meters="meters";
             this.s.scenario.network.links.link = repmat(this.X.link_struct,1,0);
             this.s.scenario.network.roadconnections.roadconnection = repmat(this.X.roadconnection_struct,1,0);
             this.s.scenario.network.roadgeoms.roadgeom = repmat(this.X.roadgeoms_struct,1,0);
@@ -35,6 +38,7 @@ classdef ScenarioBuilder < handle
             this.s.scenario.commodities.commodity = repmat(this.X.commodity_struct,1,0);
             this.s.scenario.demands.demand = repmat(this.X.link_demand_struct,1,0);
             this.s.scenario.splits.split_node = repmat(this.X.splitnode_struct,1,0);
+            this.s.scenario.models.model = this.X.model_struct_ctm;
                         
         end
         
@@ -365,6 +369,9 @@ classdef ScenarioBuilder < handle
         
         function X = build_structs()
             
+            X.model_struct_ctm = struct('ATTRIBUTE',struct('type','ctm','name','ctm','is_default','true'));
+            X.model_struct_ctm.model_params = struct('ATTRIBUTE',struct('sim_dt','1','max_cell_length','100'));
+
             X.node_struct = struct('ATTRIBUTE',struct('id',nan,'x',nan,'y',nan));
             
             X.link_struct = struct('ATTRIBUTE',struct('id',nan, ...

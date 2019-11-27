@@ -145,8 +145,13 @@ class OSMLoader:
         scenario.set('xmlns','opentrafficmodels')
         etree.SubElement(scenario,'commodities')
         models = etree.SubElement(scenario, 'models')
-        model = etree.SubElement(models,'model',{'type':'ctm','name':'myctm','is_default':'true'})
-        etree.SubElement(model,'model_params',{'sim_dt':'2','max_cell_length':'100'})
+
+        #  ctm
+        # model = etree.SubElement(models,'model',{'type':'ctm','name':'myctm','is_default':'true'})
+        # etree.SubElement(model,'model_params',{'sim_dt':'2','max_cell_length':'100'})
+
+        # spaceq
+        model = etree.SubElement(models,'model',{'type':'spaceq','name':'myspaceq','is_default':'true'})
 
         # vehicle types ............................
         commodities = next(scenario.iter('commodities'))

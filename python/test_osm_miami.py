@@ -21,24 +21,3 @@ osmtool.load_from_osm(
 osmtool.save_to_xml('miami.xml')
 
 print('DONE')
-
-
-
-
-# ERROR: id= 651292620  turn= left  lanes= 2
-# ERROR: id= 651633290  turn= left  lanes= 2
-# ERROR: id= 651633296  turn= left  lanes= 2
-# ERROR: backward id= 651633296  turn= left  lanes= 2
-# ERROR: id= 651633298  turn= left  lanes= 2
-# ERROR: backward id= 651633298  turn= left  lanes= 2
-# ERROR: id= 651634719  turn= left  lanes= 2
-# ERROR: backward id= 651634719  turn= left  lanes= 2
-# ERROR: id= 651634720  turn= left  lanes= 2
-# ERROR: backward id= 651634720  turn= left  lanes= 2
-
-
-# ERROR 'turn:lanes:both_ways' in tags and 'turn:lanes:forward' in tags
-# OSM:
-# Google:
-# Correction:
-

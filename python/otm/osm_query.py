@@ -24,7 +24,8 @@ default_lanes_each_direction = {
     'primary_link':1,
     'road':1,
     'disused':1,
-    'planned':1
+    'planned':1,
+    'slide':1
 }
 
 # OSM QUERY ---------------------------------
@@ -188,7 +189,7 @@ def __parse_jsons(jsons,fixes):
         elements.extend(json['elements'])
 
     # extract nodes and paths from the downloaded osm data
-    print('\textract nodes and paths from the downloaded osm data')
+    print('\t> extracting nodes and paths')
     links = {}
     nodes = {}
     for element in elements:
@@ -208,10 +209,10 @@ def __parse_jsons(jsons,fixes):
     max_node_id = max([x for x in nodes.keys()])+1
 
     # set in and out links
-    print('\tset in and out links')
-    for node_id, node in nodes.items():
-        node['out_links'] = set([link_id for link_id, link in links.items() if link['start_node_id']==node_id])
-        node['in_links'] = set([link_id for link_id, link in links.items() if link['end_node_id']==node_id])
+    print('\t> setting in and out links')
+    for link  in links.values():
+        nodes[link['start_node_id']]['out_links'].add(link['id'])
+        nodes[link['end_node_id']]['in_links'].add(link['id'])
 
     return links, nodes
 
@@ -483,6 +484,8 @@ def __read_node(element):
     node['y'] = element['lat']
     node['x'] = element['lon']
     node['type'] = ''
+    node['out_links'] = set()
+    node['in_links'] = set()
 
     if 'tags' not in element:
         return node
@@ -632,6 +635,7 @@ def __split_link_at_node( link, node, links, nodes ):
 def __split_streets(links, nodes):
 
     # compute internal and external nodes
+    print("\t> computing internal and external nodes")
     internal_nodes=set()
     external_nodes=set()
     for link_id,link in links.items():
@@ -647,6 +651,7 @@ def __split_streets(links, nodes):
     split_nodes = internal_and_external.union(internal_signalized)
 
     # iterate through nodes that are both internal and external
+    print("\t> iterating through", len(split_nodes), "internal && external nodes")
     for node_id in split_nodes:
         node = nodes[node_id]
         # for all links that have this as an internal node
@@ -776,10 +781,12 @@ def __compute_lengths(links,nodes):
         node_meters[node_id] = (dx, dy)
 
     for link in links.values():
-        start_node = node_meters[link['start_node_id']]
-        end_node = node_meters[link['end_node_id']]
-        link['length'] = math.sqrt( math.pow(end_node[0]-start_node[0],2) + math.pow(end_node[1]-start_node[1],2) )
-
+        total_length = 0
+        for i in range(0,len(link['nodes'])-1):
+            a = node_meters[link['nodes'][i]]
+            b = node_meters[link['nodes'][i+1]]
+            total_length += math.sqrt(math.pow(a[0]-b[0],2)+math.pow(a[1]-b[1],2))
+        link['length'] = total_length
 
 # ROAD CONNECTIONS ---------------------------------
 
@@ -904,40 +911,42 @@ def __create_road_connections(links, nodes):
 def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
 
     # 1. query osm
-    print('1. query osm')
+    print('> querying osm')
     jsons = __query_json(west, north, east, south)
 
     # 2. parse osm
-    print('2. parse osm')
+    print('> parsing osm')
     links, nodes = __parse_jsons(jsons, fixes)
+    print('\t* num nodes =', len(nodes))
+    print('\t* num links =', len(links))
 
     __remove_P_shaped_links(links, nodes)
 
     # 3. split links when
     #    a) they cross another street at an internal node,
     #    b) they contain an traffic signal at an internal node
-    print('3. split links when')
+    print('> splitting links')
     internal_nodes, external_nodes = __split_streets(links, nodes)
 
     if simplify_roundabouts:
         __simplify_roundabouts(links, nodes, external_nodes)
 
     # 4. eliminate simple external nodes
-    print('4. eliminate simple external nodes')
+    print('> eliminating simple external nodes')
     __eliminate_simple_external_nodes(links, nodes, internal_nodes, external_nodes)
 
     # 5. flip and expand links
-    print('. flip and expand links')
+    print('> flipping and expand links')
     __flip_wrong_way_links(links)
 
     __expand_bidirectional_links(links, nodes)
 
     # 6. link lengths
-    print('6. link lengths')
+    print('> computing link lengths')
     __compute_lengths(links, nodes)
 
     # 7. create road connections
-    print('7. create road connections')
+    print('> creating road connections')
     road_conns = __create_road_connections(links, nodes)
 
     return {'links': links,
