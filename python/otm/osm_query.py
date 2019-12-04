@@ -36,15 +36,16 @@ def __overpass_request(data, timeout=180):
     response_json = response.json()
     return response_json
 
-def __query_json(west=-122.2981,north=37.8790,east=-122.2547,south=37.8594):
+def __query_json(west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,exclude_tertiary=True):
 
     infrastructure = 'way["highway"]'
     timeout = 180
     osm_filter = '["area"!~"yes"]["motor_vehicle"!~"no"]["motorcar"!~"no"]["access"!~"private"]["service"!~"parking|parking_aisle|driveway|private|emergency_access"]'
-    if True:
-        osm_filter = osm_filter + '["highway"!~"footway|bridleway|steps|path|living_street|service|pedestrian|track|bus_guideway|escape|raceway|cycleway|proposed|construction|bus_stop|crossing|elevator|emergency_access_point|give_way|mini_roundabout|motorway_junction|passing_place|rest_area|speed_camera|street_lamp|services|corridor|abandoned|platform"]'
+
+    if exclude_tertiary:
+        osm_filter = osm_filter + '["highway"!~"footway|bridleway|steps|path|living_street|service|pedestrian|track|bus_guideway|escape|raceway|cycleway|proposed|construction|bus_stop|crossing|elevator|emergency_access_point|give_way|mini_roundabout|motorway_junction|passing_place|rest_area|speed_camera|street_lamp|services|corridor|abandoned|platform|tertiary|unclassified|residential|tertiary_link"]'
     else:
-        osm_filter = osm_filter + '["highway"!~"tertiary|unclassified|residential|tertiary_link|footway|bridleway|steps|path|living_street|service|pedestrian|track|bus_guideway|escape|raceway|cycleway|proposed|construction|bus_stop|crossing|elevator|emergency_access_point|give_way|mini_roundabout|motorway_junction|passing_place|rest_area|speed_camera|street_lamp|services|corridor|abandoned|platform"]'
+        osm_filter = osm_filter + '["highway"!~"footway|bridleway|steps|path|living_street|service|pedestrian|track|bus_guideway|escape|raceway|cycleway|proposed|construction|bus_stop|crossing|elevator|emergency_access_point|give_way|mini_roundabout|motorway_junction|passing_place|rest_area|speed_camera|street_lamp|services|corridor|abandoned|platform"]'
 
     maxsize = ''
 
@@ -908,11 +909,11 @@ def __create_road_connections(links, nodes):
 
 ################################################
 
-def load_from_osm(west,north,east,south,simplify_roundabouts,fixes={}):
+def load_from_osm(west,north,east,south,exclude_tertiary,simplify_roundabouts,fixes={}):
 
     # 1. query osm
     print('> querying osm')
-    jsons = __query_json(west, north, east, south)
+    jsons = __query_json(west, north, east, south, exclude_tertiary)
 
     # 2. parse osm
     print('> parsing osm')

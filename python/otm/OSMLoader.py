@@ -16,8 +16,8 @@ class OSMLoader:
         self.config_file = cfg
         self.scenario = {}
 
-    def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,fixes={},simplify_roundabouts=False,positions_in_meters=False):
-        self.scenario = osm_query.load_from_osm(west=west,north=north,east=east,south=south,fixes=fixes,simplify_roundabouts=simplify_roundabouts)
+    def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,exclude_tertiary=True,fixes={},simplify_roundabouts=False,positions_in_meters=False):
+        self.scenario = osm_query.load_from_osm(west=west,north=north,east=east,south=south,exclude_tertiary=exclude_tertiary,fixes=fixes,simplify_roundabouts=simplify_roundabouts)
 
     def get_link_table(self):
         link_ids = []
@@ -234,35 +234,37 @@ class OSMLoader:
         actuators = etree.SubElement(scenario, 'actuators')
 
         # nodes_with_signals = [node for node in self.scenario['nodes'].values() if node['type']=='traffic_signals']
-        actuator_id = 0
-        for node in self.scenario['nodes'].values():
 
-            if node['type']=='traffic_signals':
+        print("Warning: Signal extraction is turned off.")
+        # actuator_id = 0
+        # for node in self.scenario['nodes'].values():
 
-                if node['id'] not in self.scenario['external_nodes']:
-                    print("Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
-                    continue
+        #     if node['type']=='traffic_signals':
 
-                in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
-                road_conns = [road_conn for road_conn in self.scenario['road_conns'] if road_conn['in_link'] in node['in_links']]
+        #         if node['id'] not in self.scenario['external_nodes']:
+        #             print("Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
+        #             continue
 
-                ### FIGURE OUT PHASES / ROAD CONNECTIONS
+        #         in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
+        #         road_conns = [road_conn for road_conn in self.scenario['road_conns'] if road_conn['in_link'] in node['in_links']]
 
-                actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'signal'})
-                etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
-                signal = etree.SubElement(actuator,'signal')
+        #         ### FIGURE OUT PHASES / ROAD CONNECTIONS
 
-            if node['type']=='stop':
+        #         actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'signal'})
+        #         etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
+        #         signal = etree.SubElement(actuator,'signal')
 
-                if node['id'] not in self.scenario['external_nodes']:
-                    print("Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
-                    continue
+        #     if node['type']=='stop':
 
-                actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'stop'})
-                etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
+        #         if node['id'] not in self.scenario['external_nodes']:
+        #             print("Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
+        #             continue
+
+        #         actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'stop'})
+        #         etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
 
 
-            actuator_id += 1
+        #     actuator_id += 1
 
         # # SUBNETWORK DATA
         # subnetworks = SubElement(scenario, 'subnetworks')

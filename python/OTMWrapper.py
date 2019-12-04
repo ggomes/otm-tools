@@ -115,7 +115,7 @@ class OTMWrapper:
 				X['time'] = np.array(list(output.get_time()))
 			else:
 				if not np.array_equal( X['time'],np.array(list(output.get_time()))):
-					error('incompatible output requests')
+					raise ValueError('incompatible output requests')
 
 		# initialize outputs
 		num_time = len(X['time'])
