@@ -16,7 +16,7 @@ class DevelopWrapper(develop):
 
   def _compile_otm_python_api(self):
     try:
-        subprocess.call('mvn package -f javacnct/pom.xml -DskipTests'.split(' '))
+        subprocess.call('mvn package -f javacnct/pom.xml -DskipTests'.split(' '), shell=True)
     except Exception as err:
         print("Please install maven")
         sys.exit(1)
