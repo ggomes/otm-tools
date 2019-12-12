@@ -7,7 +7,7 @@ from random import sample
 
 class OTMWrapper:
 
-	def __init__(self, configfile, port_num = 25335):
+	def __init__(self, configfile, port_num = 25333):
 
 		self.configfile = configfile
 		self.sim_output = None
@@ -20,7 +20,6 @@ class OTMWrapper:
 			self.otm.load(configfile,True,False)
 
 	def __del__(self):
-
 		if self.conn is not None:
 			self.conn.close()
 
