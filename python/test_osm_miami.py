@@ -12,12 +12,4 @@ osmtool.load_from_osm(
     }
 )
 
-# X = osmtool.get_link_table()
-# X.sort_values(by='travel_time', ascending=True, inplace=True)
-# print(X)
-
-# osmtool.merge_nodes([])
-
 osmtool.save_to_xml('miami.xml')
-
-print('DONE')

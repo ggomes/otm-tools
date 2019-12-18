@@ -15,9 +15,10 @@ class OSMLoader:
     def __init__(self, cfg=''):
         self.config_file = cfg
         self.scenario = {}
+        self.model = {'name':''}
 
-    def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,exclude_tertiary=True,fixes={},simplify_roundabouts=False,positions_in_meters=False):
-        self.scenario = osm_query.load_from_osm(west=west,north=north,east=east,south=south,exclude_tertiary=exclude_tertiary,fixes=fixes,simplify_roundabouts=simplify_roundabouts)
+    def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,exclude_tertiary=True,fixes={}):
+        self.scenario = osm_query.load_from_osm(west=west,north=north,east=east,south=south,exclude_tertiary=exclude_tertiary,fixes=fixes)
 
     def get_link_table(self):
         link_ids = []
@@ -122,36 +123,36 @@ class OSMLoader:
 
         print(len(self.scenario['links']))
 
-    def merge_nodes(self, merge_nodes):
+    # model is a dictionary with minimal structure {'type':TYPE
+    # Here TYPE can be one of these strings: 'ctm','spaceq','micro','none'
+    # If it is ctm or micro, then model must also include an entry 'sim_dt' with the simulation time step in seconds (as a string).
+    def set_model(self,model):
+        self.model = {'type':model['type'],'name':'default','is_default':'true'}
+        if(model['type']=='ctm' or model['type']=='micro'):
+            self.model['sim_dt']=model['sim_dt']
 
-        # checks ...............
-        for merge_node in merge_nodes:
+        if(model['type']=='ctm'):
+            self.model['sim_dt']=model['sim_dt']
+            self.model['max_cell_length']=model['max_cell_length']
 
-            # check: merge_nodes in nodes
-            if merge_node not in self.scenario['nodes']:
-                print("ERROR: Bad node id " + merge_node)
-                continue
-
-            # check: merge_node joined by single link to another merge node
-            node = self.scenario['nodes'][merge_node]
-
-            links = node['in_links'].union(node['out_links'])
-
-            print(links)
+        if(model['type']=='mciro'):
+            self.model['sim_dt']=model['sim_dt']
 
     def save_to_xml(self, outfile):
 
         scenario=etree.Element('scenario')
         scenario.set('xmlns','opentrafficmodels')
         etree.SubElement(scenario,'commodities')
+
+        # model
         models = etree.SubElement(scenario, 'models')
+        model = etree.SubElement(models,'model',{'type':self.model['type'],'name':'default','is_default':'true'})
 
-        #  ctm
-        # model = etree.SubElement(models,'model',{'type':'ctm','name':'myctm','is_default':'true'})
-        # etree.SubElement(model,'model_params',{'sim_dt':'2','max_cell_length':'100'})
+        if(self.model['type']=='ctm'):
+            model_params = etree.SubElement(model, 'model_params',{'sim_dt':self.model['sim_dt'],'max_cell_length':self.model['max_cell_length']})
 
-        # spaceq
-        model = etree.SubElement(models,'model',{'type':'spaceq','name':'myspaceq','is_default':'true'})
+        if(self.model['type']=='mciro'):
+            model_params = etree.SubElement(model, 'model_params',{'sim_dt':self.model['sim_dt']})
 
         # vehicle types ............................
         commodities = next(scenario.iter('commodities'))
@@ -235,7 +236,7 @@ class OSMLoader:
 
         # nodes_with_signals = [node for node in self.scenario['nodes'].values() if node['type']=='traffic_signals']
 
-        print("Warning: Signal extraction is turned off.")
+        print("[WARNING] Signal extraction is deactivated.")
         # actuator_id = 0
         # for node in self.scenario['nodes'].values():
 
