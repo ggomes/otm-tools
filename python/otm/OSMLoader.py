@@ -146,6 +146,10 @@ class OSMLoader:
 
         # model
         models = etree.SubElement(scenario, 'models')
+
+        if 'type' not in self.model:
+            self.model['type'] = 'spaceq'
+
         model = etree.SubElement(models,'model',{'type':self.model['type'],'name':'default','is_default':'true'})
 
         if(self.model['type']=='ctm'):

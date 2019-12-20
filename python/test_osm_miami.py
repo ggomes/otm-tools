@@ -7,7 +7,6 @@ osmtool.load_from_osm(
     south=25.1923,
     east=-80.1107,
     west=-80.8593,
-    simplify_roundabouts=False,
     fixes={
     }
 )
