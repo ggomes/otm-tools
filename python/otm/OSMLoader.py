@@ -138,13 +138,35 @@ class OSMLoader:
         if(model['type']=='mciro'):
             self.model['sim_dt']=model['sim_dt']
 
+    def set_demands_per_commodity_and_source_vph(self,demand):
+        self.scenario['demand_per_commodity_source'] = demand
+
+    def __delete_link(self,link_id):
+
+        link = self.scenario['links'][link_id]
+
+        # remove link from start node
+        node = self.scenario['nodes'][link['start_node_id']]
+        if link_id in node['out_links']:
+            node['out_links'].remove(link_id)
+
+        # remove link from end node
+        node = self.scenario['nodes'][link['end_node_id']]
+        if link_id in node['in_links']:
+            node['in_links'].remove(link_id)
+
+        # remove exiting road connections
+        self.scenario['road_conns'] = [rc for rc in self.scenario['road_conns'] if rc['in_link']!=link_id and rc['out_link']!=link_id]
+
+        del self.scenario['links'][link_id]
+
     def save_to_xml(self, outfile):
 
         scenario=etree.Element('scenario')
         scenario.set('xmlns','opentrafficmodels')
         etree.SubElement(scenario,'commodities')
 
-        # model
+        # model .......................................
         models = etree.SubElement(scenario, 'models')
 
         if 'type' not in self.model:
@@ -170,13 +192,13 @@ class OSMLoader:
         for road_type_name,road_type_params in road_param_types.items():
             etree.SubElement(road_params, 'roadparam', {
                 'id': str(road_type_params['id']),
+                'name': road_type_name,
                 'capacity': str(road_type_params['capacity']),
                 'speed': str(road_type_params['speed']),
                 'jam_density': str(road_type_params['jam_density'])
             })
 
         # get all node positions ......................
-        # node_id_map={}
         node_set = etree.SubElement(network, 'nodes', {'gps_or_meters': 'gps'})
         node_id = 0
         for node_osmid in self.scenario['external_nodes']:
@@ -238,38 +260,35 @@ class OSMLoader:
         # actuators .............................
         actuators = etree.SubElement(scenario, 'actuators')
 
-        # nodes_with_signals = [node for node in self.scenario['nodes'].values() if node['type']=='traffic_signals']
+        actuator_id = 0
+        for node in self.scenario['nodes'].values():
 
-        print("[WARNING] Signal extraction is deactivated.")
-        # actuator_id = 0
-        # for node in self.scenario['nodes'].values():
+            if node['type']=='traffic_signals':
 
-        #     if node['type']=='traffic_signals':
+                if node['id'] not in self.scenario['external_nodes']:
+                    print("Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
+                    continue
 
-        #         if node['id'] not in self.scenario['external_nodes']:
-        #             print("Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
-        #             continue
+                in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
+                road_conns = [road_conn for road_conn in self.scenario['road_conns'] if road_conn['in_link'] in node['in_links']]
 
-        #         in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
-        #         road_conns = [road_conn for road_conn in self.scenario['road_conns'] if road_conn['in_link'] in node['in_links']]
+                ### FIGURE OUT PHASES / ROAD CONNECTIONS
 
-        #         ### FIGURE OUT PHASES / ROAD CONNECTIONS
+                actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'signal'})
+                etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
+                signal = etree.SubElement(actuator,'signal')
 
-        #         actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'signal'})
-        #         etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
-        #         signal = etree.SubElement(actuator,'signal')
+            if node['type']=='stop':
 
-        #     if node['type']=='stop':
+                if node['id'] not in self.scenario['external_nodes']:
+                    print("Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
+                    continue
 
-        #         if node['id'] not in self.scenario['external_nodes']:
-        #             print("Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
-        #             continue
-
-        #         actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'stop'})
-        #         etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
+                actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'stop'})
+                etree.SubElement(actuator,'actuator_target',{'type':'node','id':str(node['id'])})
 
 
-        #     actuator_id += 1
+            actuator_id += 1
 
         # # SUBNETWORK DATA
         # subnetworks = SubElement(scenario, 'subnetworks')
@@ -281,25 +300,38 @@ class OSMLoader:
         #     subnet_links = sorted([i[0] for i in subnet_pairs if i[1] == subnet_id])
         #     subnetwork = SubElement(subnetworks, 'subnetwork', {'id': str(subnet_id)})
         #     subnetwork.text = ','.join([str(i) for i in subnet_links])
+        #
+
+        # DEMANDS
+        if 'demand_per_commodity_source' in self.scenario:
+            demands = etree.SubElement(scenario, 'demands')
+            for link in self.scenario['links'].values():
+                start_node = self.scenario['nodes'][link['start_node_id']]
+                end_node = self.scenario['nodes'][link['end_node_id']]
+                if len(start_node['in_links'])==0 and len(end_node['out_links'])>0:
+                    demand = etree.SubElement(demands, 'demand',{'link_id':str(link['id']),'commodity_id':'0'})
+                    demand.text = str(self.scenario['demand_per_commodity_source'])
+
+        # SPLITS
+        if 'demand_per_commodity_source' in self.scenario:
+            splits = etree.SubElement(scenario, 'splits')
+            for node in self.scenario['nodes'].values():
+
+                for in_link in node['in_links']:
+                    rcs = [rc for rc in self.scenario['road_conns'] if rc['in_link']==in_link]
+                    reachable_links = [rc['out_link'] for rc in rcs]
+
+                    if len(reachable_links)==0:
+                        continue
+
+                    split_node = etree.SubElement(splits, 'split_node',
+                                                  {'commodity_id': '0', 'node_id': str(node['id']),
+                                                   'link_in': str(in_link)})
+
+                    for out_link in reachable_links:
+                        split = etree.SubElement(split_node, 'split', {'link_out': str(out_link)})
+                        split.text = str(1 / len(reachable_links))
 
         with open(outfile, 'wb') as xml_file:
             xml_file.write(etree.tostring(scenario, pretty_print=True))
 
-    def __delete_link(self,link_id):
-
-        link = self.scenario['links'][link_id]
-
-        # remove link from start node
-        node = self.scenario['nodes'][link['start_node_id']]
-        if link_id in node['out_links']:
-            node['out_links'].remove(link_id)
-
-        # remove link from end node
-        node = self.scenario['nodes'][link['end_node_id']]
-        if link_id in node['in_links']:
-            node['in_links'].remove(link_id)
-
-        # remove exiting road connections
-        self.scenario['road_conns'] = [rc for rc in self.scenario['road_conns'] if rc['in_link']!=link_id and rc['out_link']!=link_id]
-
-        del self.scenario['links'][link_id]
