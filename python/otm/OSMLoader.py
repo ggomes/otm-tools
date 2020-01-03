@@ -211,11 +211,11 @@ class OSMLoader:
             })
             node_id += 1
 
-        link_id_map = {}
+        # link_id_map = {}
         link_set = etree.SubElement(network, 'links')
-        link_id = 0
+        # link_id = 0
         for link_osmid, link in self.scenario['links'].items():
-            link_id_map[str(link['id'])] = link_id
+            # link_id_map[str(link['id'])] = link_id
 
             if link['start_node_id'] not in self.scenario['nodes'].keys():
                 print('ERROR: link[start_node_id] not in nodes.keys()')
@@ -231,7 +231,7 @@ class OSMLoader:
                 'end_node_id': str(link['end_node_id']),
                 'roadparam': str(link['roadparam'])
             })
-            link_id += 1
+            # link_id += 1
 
             epoints = etree.SubElement(elink,'points')
             for node_id in link['nodes']:
@@ -244,6 +244,7 @@ class OSMLoader:
         # road connections ....................................
         rc_id = 0
         roadconnections = etree.SubElement(network, 'roadconnections')
+        links_with_rcs = set()
 
         for road_conn in self.scenario['road_conns']:
             rc=etree.SubElement(roadconnections, 'roadconnection', {
@@ -251,6 +252,7 @@ class OSMLoader:
                 'in_link': str(road_conn['in_link']),
                 'out_link': str(road_conn['out_link']),
             })
+            links_with_rcs.add(road_conn['in_link'])
             if 'in_link_lanes' in road_conn:
                 rc['in_link_lanes'] = '{}#{}'.format(min(road_conn['in_link_lanes']), max(road_conn['in_link_lanes']))
             if 'out_link_lanes' in road_conn:
@@ -314,12 +316,17 @@ class OSMLoader:
 
         # SPLITS
         if 'demand_per_commodity_source' in self.scenario:
+
             splits = etree.SubElement(scenario, 'splits')
             for node in self.scenario['nodes'].values():
 
                 for in_link in node['in_links']:
                     rcs = [rc for rc in self.scenario['road_conns'] if rc['in_link']==in_link]
-                    reachable_links = [rc['out_link'] for rc in rcs]
+
+                    if len(rcs)==0:
+                        reachable_links = node['out_links']
+                    else:
+                        reachable_links = [rc['out_link'] for rc in rcs]
 
                     if len(reachable_links)==0:
                         continue
