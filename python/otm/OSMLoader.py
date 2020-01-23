@@ -1,6 +1,5 @@
 from . import osm_query
 from lxml import etree
-import pandas as pd
 
 road_param_types = {
     'residential':      {'id': 0, 'capacity': 2000, 'speed': 100, 'jam_density': 100},
@@ -19,20 +18,6 @@ class OSMLoader:
 
     def load_from_osm(self,west=-122.2981,north=37.8790,east=-122.2547,south=37.8594,exclude_tertiary=True,fixes={}):
         self.scenario = osm_query.load_from_osm(west=west,north=north,east=east,south=south,exclude_tertiary=exclude_tertiary,fixes=fixes)
-
-    def get_link_table(self):
-        link_ids = []
-        link_lengths = []
-        travel_time = []
-        speed_kph = []
-        for link in self.scenario['links'].values():
-            link_ids.append(link['id'])
-            link_lengths.append(link['length'])
-            speed = next(iter(set([rp['speed'] for rp in road_param_types.values() if rp['id']==link['roadparam']])))
-            speed_kph.append(speed)
-            travel_time.append(link['length']*3.6/speed)
-
-        return pd.DataFrame(data={'id':link_ids,'length':link_lengths,'speed_kph':speed_kph,'travel_time':travel_time})
 
     def join_links_shorter_than(self, min_length_meters):
 
