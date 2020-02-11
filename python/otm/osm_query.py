@@ -465,13 +465,19 @@ def __read_way(element,fixes):
     # resolve undefined number of lanes
     if math.isnan(link['lanes']):
         if link['turn_lanes'] == '*':
-            link['lanes'] = default_lanes_each_direction[link['highway']]
+            if link['highway'] in default_lanes_each_direction:
+                link['lanes'] = default_lanes_each_direction[link['highway']]
+            else:
+                link['lanes'] = 1
         else:
             link['lanes'] = len(link['turn_lanes'].split('|'))
 
     if math.isnan(link['lanes_backward']):
         if link['turn_lanes_backward'] == '*':
-            link['lanes_backward'] = default_lanes_each_direction[link['highway']]
+            if link['highway'] in default_lanes_each_direction:
+                link['lanes_backward'] = default_lanes_each_direction[link['highway']]
+            else:
+                link['lanes_backward'] = 1
         else:
             link['lanes_backward'] = len(link['turn_lanes_backward'].split('|'))
 
