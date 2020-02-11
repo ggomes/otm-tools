@@ -662,7 +662,8 @@ def __expand_bidirectional_links(links, nodes):
 
         existing_backward_links = [link for link in links.values() if link['start_node_id']==end_node_id and link['end_node_id']==start_node_id]
         if len(existing_backward_links)>0:
-            print("[ERROR] OSM returned a backwards link.")
+            print("[WARNING] OSM returned a backwards link. I'm skipping this bi-directional link ", link['id'])
+            continue
 
         backward_link = link.copy()
 
