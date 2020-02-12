@@ -211,7 +211,7 @@ class OSMLoader:
             elink=etree.SubElement(link_set, 'link', {
                 'id': str(link_osmid),
                 'length': '{:.2f}'.format(link['length']),  # WHAT UNITS IS THIS IN?
-                'full_lanes': str(link['lanes']),  # HOW TO GET THE LANES?
+                'full_lanes': str(max(1,link['lanes'])),  # HOW TO GET THE LANES?
                 'start_node_id': str(link['start_node_id']),
                 'end_node_id': str(link['end_node_id']),
                 'roadparam': str(link['roadparam'])
