@@ -287,13 +287,18 @@ def __read_way(element,fixes):
             link['flip'] = False
             link['bidirectional'] = False
 
-        if tags['oneway'] == 'no':
+        elif tags['oneway'] == 'no':
             link['flip'] = False
             link['bidirectional'] = True
 
-        if tags['oneway'] == '-1':
+        elif tags['oneway'] == '-1':
             link['flip'] = True
             link['bidirectional'] = False
+
+        else:
+            link['flip'] = False
+            link['bidirectional'] = False
+
     else:
         link['flip'] = False
         if 'lanes:backward' in tags:
