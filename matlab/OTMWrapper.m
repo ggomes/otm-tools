@@ -234,10 +234,10 @@ classdef OTMWrapper < handle
                     
                     xind = index_into(link_id,X.link_ids);
                     switch char(output.getClass().getName())
-                        case 'output.LinkFlow'
+                        case 'output.OutputLinkFlow'
                             X.flows_vph(xind,:) = diff(Java2Matlab(z.get_values))*3600/double(z.get_dt);
-                        case 'output.LinkVehicles'
-                            X.vehs(xind,:) = Java2Matlab(z.get_values);
+                        case 'output.OutputLinkVehicles'
+                            X.vehs(xind,:) = Java2Matlab(z.get_values);                       
                     end
                     
                 end
@@ -254,7 +254,7 @@ classdef OTMWrapper < handle
                 end
                 
                 ffspeed_kph = link_info.get_ffspeed_kph();
-                link_length_km = link_info.getFull_length/1000;
+                link_length_km = link_info.getFull_length/1000;                
                 speed_kph = link_length_km * X.flows_vph(i,:) ./ X.vehs(i,1:end-1);
                 speed_kph(speed_kph>ffspeed_kph) = ffspeed_kph;
                 X.speed_kph(i,:) = speed_kph;
@@ -337,11 +337,14 @@ classdef OTMWrapper < handle
             end
             
             this.api.output.clear()
-            this.api.output.request_links_flow([],link_ids, java.lang.Float(request_dt));
-            this.api.output.request_links_veh([],link_ids, java.lang.Float(request_dt));
+            if ~link_ids.isEmpty()
+                this.api.output.request_links_flow([],link_ids, java.lang.Float(request_dt));
+                this.api.output.request_links_veh([],link_ids, java.lang.Float(request_dt));
+            end
             
             % run the simulation
             this.api.run( uint32(start_time), uint32(duration));
+
         end
         
         % run a simulation
@@ -380,11 +383,6 @@ classdef OTMWrapper < handle
                 error('Too few input arguments')
             end
             this.api.advance(duration)
-        end
-        
-        % Get scenario information.
-        function [X] = get_info(this)
-            X = Java2Matlab(this.api.scenario.get_info);
         end
         
         function [X] = get_models(this)
@@ -552,12 +550,12 @@ classdef OTMWrapper < handle
         
         % Get information for all controllers in the scenario.
         function X = get_controllers(this)
-            X = Java2Matlab(this.api.scenario.get_controllers);
+            X = Java2Matlab(this.api.scenario.get_controller_infos);
         end
         
         % Get information for a specific myController.
         function X = get_controller_with_id(this, id)
-            X = Java2Matlab(this.api.scenario.get_controller_with_id(id));
+            X = Java2Matlab(this.api.scenario.get_controller_info(id));
         end
         
         function X = get_actual_controller_with_id(this,id)

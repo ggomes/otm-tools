@@ -5,7 +5,8 @@ duration = 3600;
 advance_time = 300;
 
 % load the configuration file into an OTMWrapper object
-otm = OTMWrapper('../configs/line.xml');
+root = fileparts(fileparts(mfilename('fullpath')));
+otm = OTMWrapper(fullfile(root,'configs','line_macro.xml'));
 
 % initialize (prepare/rewind the simulation)
 otm.initialize(start_time);
@@ -19,7 +20,6 @@ while(time<end_time)
 
 	% Insert your code here -----
 	disp(otm.api.get_current_time())
-
-
+    
 	time = time + advance_time;
 end

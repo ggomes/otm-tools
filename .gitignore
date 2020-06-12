@@ -1,4 +1,5 @@
 *.pickle
+.idea/
 *.iml
 *.png
 java/demos/out/

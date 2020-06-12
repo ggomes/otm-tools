@@ -4,7 +4,7 @@ close all
 import api.OTM
 
 root = fileparts(fileparts(mfilename('fullpath')));
-otm = OTMWrapper(fullfile(root,'configs','line.xml'));
+otm = OTMWrapper(fullfile(root,'configs','line_macro.xml'));
 
 link_ids = [1 2 3];
 outDt = 10;
@@ -13,7 +13,6 @@ output_folder = 'myoutputfolder';
 commodity_id = [];
 subnetwork_id = 0;
 
-X = otm.get_info()
 X = otm.get_models()
 X = otm.get_num_commodities()
 X = otm.get_commodities()
@@ -113,7 +112,6 @@ otm.request_vehicle_travel_time()
 X = otm.get_file_names()
 
 otm.clear()
-
 
 start_time = 0;
 duration = 1500;

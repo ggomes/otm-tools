@@ -2,17 +2,14 @@
 import api.OTM
 
 % load the configuration file into an OTMWrapper object
-cd(fileparts(mfilename('fullpath')))
-otm = OTMWrapper('../configs/line_macro.xml');
+root = fileparts(fileparts(mfilename('fullpath')));
+otm = OTMWrapper(fullfile(root,'configs','line_macro.xml'));
 
 % Plot the network
 otm.show_network(10)
 
 % Table of link information
 X = otm.get_link_table
-
-% All information in the configuration
-X = otm.get_info()
 
 % run a simulation
 start_time = 0;
