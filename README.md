@@ -15,7 +15,7 @@ If needed, go [here to install Java 11](https://www.oracle.com/technetwork/java/
 
 ## Python ##
 
-**1.** `otm-tools` uses py4j to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. Tou will need Apache Maven to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
+**1.** `otm-tools` uses py4j to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. You will need Apache Maven to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
 
 **2.** Test your Maven installation:
 ```BASH
@@ -31,7 +31,7 @@ python setup.py develop
 
 **5.** Test the installation. Run one of the demos. For example, `demo_run.py` should generate two plots.
 ```BASH
-python run_demo.py
+python demo_run.py
 ```
 
 These steps require the following Python packages: `py4j`,`numpy`,`matplotlib`.
