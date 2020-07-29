@@ -41,7 +41,6 @@ public class OTMConnect {
 
 				// version
 				else if (cmd.equals("-version")){
-					System.out.println("otm-base: " + OTMUtils.getBaseGitHash());
 					System.out.println("otm-sim: " + api.OTM.get_version());
 					return;
 				}
@@ -61,9 +60,8 @@ public class OTMConnect {
 		} catch(Exception e){
 			if(gatewayServer!=null)
 				gatewayServer.shutdown();
-			throw new Exception("Could not initialize Java Gateway");
+			throw new Exception(e);
 		}
-
 
 	}
 

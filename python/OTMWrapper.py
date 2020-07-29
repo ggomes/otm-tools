@@ -10,20 +10,20 @@ import networkx as nx
 
 class OTMWrapper:
 
-    def __init__(self, configfile, jaxb_only=False):
+    def __init__(self, configfile, jaxb_only=False, port_num = 25333):
 
         self.configfile = configfile
         self.sim_output = None
         self.start_time = None
         self.duration = None
 
-        self.conn = JavaConnect()
+        self.conn = JavaConnect(port_num = port_num)
         if self.conn.pid is not None:
             self.otm = self.conn.gateway.get()
             self.otm.load(configfile, True, jaxb_only)
 
     def __del__(self):
-        if self.conn is not None:
+        if hasattr(self, 'conn') and self.conn is not None:
             self.conn.close()
 
     def describe(self):
@@ -180,9 +180,9 @@ class OTMWrapper:
             for i in range(len(link_list)):
                 z = output.get_profile_for_linkid(link_list[i])
                 classname = output.getClass().getSimpleName()
-                if (classname == "LinkFlow"):
+                if (classname == "OutputLinkFlow"):
                     X['flows_vph'][i, 0:-1] = np.diff(np.array(list(z.get_values()))) * 3600.0 / z.get_dt()
-                if (classname == "LinkVehicles"):
+                if (classname == "OutputLinkVehicles"):
                     X['vehs'][i, :] = np.array(list(z.get_values()))
 
         X['speed_kph'] = np.empty([num_links, num_time])

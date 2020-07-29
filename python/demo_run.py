@@ -12,10 +12,10 @@ configfile = os.path.join(root_folder, 'configs', 'line_macro.xml')
 otm = OTMWrapper(configfile)
 
 # Plot the network
-otm.show_network(4)
+# otm.show_network(4)
 
 # run a simulation
-otm.run_simple(start_time=0,duration=3000,output_dt=10)
+otm.run_simple(start_time=0,duration=2500,output_dt=10)
 
 # extract the state trajectory
 Y = otm.get_state_trajectory()
@@ -38,5 +38,4 @@ plt.draw()
 
 plt.show()
 
-# always end by deleting the wrapper
-del otm
+

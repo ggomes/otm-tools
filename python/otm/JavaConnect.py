@@ -49,7 +49,6 @@ class JavaConnect():
             sys.exit()
 
     def openLinux(self, jar_file_name, port_number):
-
         self.pid = os.fork()
 
         if self.pid == 0:
@@ -73,9 +72,10 @@ class JavaConnect():
     def close(self):
         if platform.system() == "Windows":
             #self.process.terminate()
-            os.kill(self.process.pid, signal.CTRL_C_EVENT)
+            os.kill(self.pid, signal.CTRL_C_EVENT)
         elif platform.system() in ["Linux", "Darwin"]:
-            os.kill(0, signal.SIGTERM)
+            self.gateway.shutdown()
+            os.kill(self.pid, signal.SIGTERM)
         else:
             raise Exception('Unknown platform')
 
