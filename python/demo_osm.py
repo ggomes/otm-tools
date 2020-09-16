@@ -4,7 +4,7 @@ import pickle
 osmtool = OSMLoader()
 osmtool.load_from_osm(
     west=-122.2981, north=37.8790, east=-122.2547, south=37.8594,
-    simplify_roundabouts=True,
+    # simplify_roundabouts=True,
     fixes={
         # turns: left | | | lanes 3
         # OSM: https://www.openstreetmap.org/way/415803770#map=19/37.87693/-122.28277
@@ -27,23 +27,12 @@ osmtool.load_from_osm(
     }
 )
 
-# X = osmtool.get_link_table()
-# X.sort_values(by='travel_time', ascending=True, inplace=True)
-# print(X)
-
-# with open('berkeley.pickle','wb') as file:
-#     pickle.dump( osmtool, file)
-# with open('berkeley.pickle','rb') as file:
-#     otm=pickle.load(file)
-
-
 osmtool.join_links_shorter_than(500.0)
 
 # link = osmtool.scenario['links'][25315496]
-
 # osmtool.merge_nodes([243670960, 53085601, 243670958])
 # osmtool.merge_nodes([243670957, 53085641, 243670955])
 
-osmtool.save_to_xml('berkeley_simp.xml')
+osmtool.save_to_xml('berkeley1.xml')
 
 print('DONE')

@@ -12,4 +12,4 @@ osmloader.load_from_osm(
 osmloader.set_model({'type':'ctm','sim_dt':'2','max_cell_length':'100'})
 osmloader.set_demands_per_commodity_and_source_vph(200)
 
-osmloader.save_to_xml('berkeley.xml')
+osmloader.save_to_xml('berkeley2.xml')

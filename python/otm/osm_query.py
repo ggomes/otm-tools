@@ -1,3 +1,5 @@
+# Portions of this code have been extracted from https://github.com/gboeing/osmnx
+
 import math
 import time
 import numpy as np
@@ -31,7 +33,7 @@ default_lanes_each_direction = {
 # OSM QUERY ---------------------------------
 def __overpass_request(data, timeout=180):
     url = 'http://overpass-api.de/api/interpreter'
-    headers = {'User-Agent': 'Open Traffic Models (https://github.com/ggomes/otm-sim)', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'referer': 'Open Traffic Models (https://github.com/ggomes/otm-sim)', 'Accept-Language': 'en'}
+    headers = {'User-Agent': 'OTM (https://github.com/ggomes/otm-sim)', 'Accept-Encoding': 'gzip, deflate', 'Accept': '*/*', 'Connection': 'keep-alive', 'referer': 'Open Traffic Models (https://github.com/ggomes/otm-sim)', 'Accept-Language': 'en'}
     response = requests.post(url, data=data, timeout=timeout, headers=headers)
     response_json = response.json()
     return response_json
@@ -159,7 +161,7 @@ def __project_gdf(gdf, to_crs=None, to_latlong=False):
         else:
             # else, project the gdf to UTM
             # if GeoDataFrame is already in UTM, just return it
-            if (gdf.crs is not None) and ('+proj=utm ' in gdf.crs):
+            if (gdf.crs is not None) and ('+proj=utm ' in gdf.crs.to_string()):
                 return gdf
 
             # calculate the centroid of the union of all the geometries in the
