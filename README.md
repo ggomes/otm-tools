@@ -3,38 +3,32 @@ Tools for Open Traffic Models
 
 # Installation #
 
-**1.** OTM works with Java 11.0.5 or later. Check your Java version:
-```BASH
-java -version
-```
-If needed, go [here to install Java 11](https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html).
+**1.** You will need Java 11.0.5 or later.
 
 **2.** Obtain the OTM jar file. Follow [these instructions](https://ggomes.github.io/otm-sim/installation.html) to either build the OTM jar file or download it.
 
-**3.** Download or clone the `otm-tools` repository to your computer. 
+**3.** Download the `otm-tools` source code. 
 
 ## Python ##
 
 **1.** `otm-tools` uses py4j to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. You will need Apache Maven to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
 
-**2.** Test your Maven installation:
-```BASH
-mvn -v
-```
+**2.** Copy `otm-tools/setting.xml` to `~/.m2`. If you do not have a folder called `.m2` in your home directory, then run the `mvn` command to create it.
 
-**3.** Copy `otm-tools/setting.xml` to `~/.m2`. If you do not have a folder called `.m2` in your home directory, then run the `mvn` command to create it.
-
-**4.** Build the py4j connector. From `otm-tools/python` folder, run 
+**3.** Build the py4j connector. From `otm-tools/python` folder, run 
 ```BASH
 python setup.py develop
 ```
 
-**5.** Test the installation. Run one of the demos. For example, `demo_run.py` should generate two plots.
+**4.** Configure Python. For example, with the `conda` YAML file:
+```BASH
+conda env create -f otmenv.yml 
+```
+
+**5.** Test the installation. Run one of the demos. For example, `demo_run.py` should generate a plot.
 ```BASH
 python demo_run.py
 ```
-
-These steps require the following Python packages: `py4j`,`numpy`,`matplotlib`.
 
 ## Matlab ##
 
