@@ -108,9 +108,10 @@ class OSMLoader:
 
         print(len(self.scenario['links']))
 
-    # model is a dictionary with minimal structure {'type':TYPE
-    # Here TYPE can be one of these strings: 'ctm','spaceq','micro','none'
-    # If it is ctm or micro, then model must also include an entry 'sim_dt' with the simulation time step in seconds (as a string).
+    # model is a dictionary with minimal structure {'type':TYPE}
+    # TYPE is one of {'ctm','spaceq','micro','none'}
+    # If it is 'ctm' or 'micro', then model must also include an entry 'sim_dt' with the simulation time step in seconds (as a string).
+    # If it is 'ctm', then model must also include an entry 'max_cell_length' with the maximum cell length in meters (as a string)
     def set_model(self,model):
         self.model = {'type':model['type'],'name':'default','is_default':'true'}
         if(model['type']=='ctm' or model['type']=='micro'):

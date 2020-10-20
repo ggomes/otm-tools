@@ -4,7 +4,7 @@ import pickle
 osmtool = OSMLoader()
 osmtool.load_from_osm(
     west=-122.2981, north=37.8790, east=-122.2547, south=37.8594,
-    # simplify_roundabouts=True,
+    exclude_tertiary=False,
     fixes={
         # turns: left | | | lanes 3
         # OSM: https://www.openstreetmap.org/way/415803770#map=19/37.87693/-122.28277
@@ -27,12 +27,19 @@ osmtool.load_from_osm(
     }
 )
 
+osmtool.simplify_roundabouts()
+
 osmtool.join_links_shorter_than(500.0)
 
-# link = osmtool.scenario['links'][25315496]
-# osmtool.merge_nodes([243670960, 53085601, 243670958])
-# osmtool.merge_nodes([243670957, 53085641, 243670955])
+osmtool.merge_nodes([243670960, 53085601, 243670958])
 
-osmtool.save_to_xml('berkeley1.xml')
+osmtool.set_demands_per_commodity_and_source_vph(demand)
+
+osmtool.set_model({
+    'type' : 'ctm',
+    'sim_dt' : '2',
+    'max_cell_length' : '100'})
+
+osmtool.save_to_xml('berkeley3.xml')
 
 print('DONE')

@@ -25,7 +25,7 @@ class DevelopWrapper(develop):
         print("Please install maven")
         sys.exit(1)
 
-with open("README.md", "r") as fh:
+with open("../README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
