@@ -1,26 +1,32 @@
 # otm-tools
-Tools for Open Traffic Models
+Tools for [Open Traffic Models](https://github.com/ggomes/otm-sim).
 
 # Installation #
 
-**1.** You will need Java 11.0.5 or later.
++ Java
+```
+$ java -version
+java version "11.0.5" 2019-10-15 LTS
+Java(TM) SE Runtime Environment 18.9 (build 11.0.5+10-LTS)
+Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.5+10-LTS, mixed mode)
+```
 
-**2.** Obtain the OTM jar file. Follow [these instructions](https://ggomes.github.io/otm-sim/installation.html) to either build the OTM jar file or download it.
++ [Download the latest OTM jar file](https://mymavenrepo.com/repo/XtcMAROnIu3PyiMCmbdY/edu/berkeley/ucbtrans/otm-sim/1.0-SNAPSHOT/). This is the most recent file of the form `otm-sim-1.0-YYYYMMDD.HHMMSS-N-jar-with-dependencies.jar`. 
 
-**3.** Download the `otm-tools` source code. 
++ Download the [source code](https://github.com/ggomes/otm-tools).
 
 ## Python ##
 
-**1.** `otm-tools` uses py4j to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. You will need Apache Maven to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
+**1.** `otm-tools` uses `py4j` to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. You will need Apache [Maven](https://maven.apache.org/) to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
 
-**2.** Copy `otm-tools/setting.xml` to `~/.m2`. If you do not have a folder called `.m2` in your home directory, then run the `mvn` command to create it.
+**2.** Copy `otm-tools/setting.xml` to `~/.m2`. If you do not have this folder in your home directory, then run the `mvn` command to create it.
 
-**3.** Build the py4j connector. From `otm-tools/python` folder, run 
+**3.** Build the `py4j` connector. From `otm-tools/python` folder, run 
 ```BASH
 python setup.py develop
 ```
 
-**4.** Configure Python. For example, with the `conda` YAML file:
+**4.** Install the required Python packages, for example with the `conda` YAML file:
 ```BASH
 conda env create -f otmenv.yml 
 ```
@@ -30,7 +36,9 @@ conda env create -f otmenv.yml
 python demo_run.py
 ```
 
-## Matlab ##
+## Matlab (not supported) ##
+
+**NOTE** Problems pop up when you change Matlab's Java. These are version-dependent, and difficult to deal with. I will support this again when Matlab upgrades its native Java environment to version 11.
 
 **1.** Change Matlab's Java version to 11.0.5. This is done by setting the `MATLAB_JAVA` environment variable to the full path of the Java 11 folder. For example, on Linux `echo $MATLAB_JAVA` might return
 ```BASH
