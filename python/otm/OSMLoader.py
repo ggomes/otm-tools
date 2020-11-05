@@ -140,6 +140,70 @@ class OSMLoader:
         all_node_ids = lrg_net.union(self.scenario['internal_nodes'])
         self.scenario['nodes'] = { id:node for (id,node) in self.scenario['nodes'].items() if node['id'] in all_node_ids }
 
+    def merge_links(self,link_pairs):
+        
+        links = self.scenario['links']
+        for link_pair in link_pairs:
+            
+            if link_pair[0] not in links:
+                print("Warning: Bad link id: ", link_pair[0])
+                continue
+            
+            if link_pair[1] not in links:
+                print("Warning: Bad link id: ", link_pair[1])
+                continue
+
+            linkA = links[link_pair[0]]
+            linkB = links[link_pair[1]]
+
+            if linkA['start_node_id']==linkB['end_node_id']:
+                link0 = linkB
+                link1 = linkA
+            elif linkB['start_node_id']==linkA['end_node_id']:
+                link0 = linkA
+                link1 = linkB
+            else:
+                print("These links are not connected")
+                continue
+
+            node_id = link0['end_node_id']
+            node = self.scenario['nodes'][node_id]
+
+            # remove links from node
+            node['in_links'].remove(link0['id'])
+            node['out_links'].remove(link1['id'])
+
+            # delete this node from external_nodes if it is now isolated
+            if len(node['in_links'])==0 and len(node['out_links'])==0:
+                self.scenario['external_nodes'].remove(node_id)
+
+            # node is now internal
+            self.scenario['internal_nodes'].add(node_id)
+            node['type'] = ''
+
+            # disconnect link1 from end_node, connect link0
+            end_node = self.scenario['nodes'][link1['end_node_id']]
+            end_node['in_links'].remove(link1['id'])
+            end_node['in_links'].add(link0['id'])
+
+            # modify link0
+            link0['end_node_id'] = end_node['id']
+            link0['length'] = link0['length'] + link1['length'] 
+            link0['nodes'].remove(node_id)
+            link0['nodes'].extend(link1['nodes'])
+
+            # get road connections leaving link1 and assign them to link0
+            rcs = [ rc for rc in self.scenario['road_conns'] if rc['in_link']==link1['id'] ]
+            for rc in rcs:
+                rc['in_link'] = link0['id']
+                rc['in_lanes'] = list(range(link0['lanes']))+1
+
+            # delete road connections between link0 and link1
+            self.scenario['road_conns'] = [rc for rc in self.scenario['road_conns'] if rc['in_link']==link0['id'] or rc['out_link']==link1['id']]
+
+            # delete link1
+            del links[link1['id']]
+
 
     def set_demands_per_commodity_and_source_vph(self,demand):
         self.scenario['demand_per_commodity_source'] = demand
