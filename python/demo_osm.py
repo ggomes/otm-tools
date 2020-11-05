@@ -27,19 +27,19 @@ osmtool.load_from_osm(
     }
 )
 
-osmtool.simplify_roundabouts()
+# osmtool.simplify_roundabouts()
 
-osmtool.join_links_shorter_than(500.0)
+# osmtool.join_links_shorter_than(500.0)
 
-osmtool.merge_nodes([243670960, 53085601, 243670958])
+# osmtool.merge_nodes([243670960, 53085601, 243670958])
 
-osmtool.set_demands_per_commodity_and_source_vph(demand)
+# osmtool.set_demands_per_commodity_and_source_vph(demand)
 
 osmtool.set_model({
     'type' : 'ctm',
     'sim_dt' : '2',
     'max_cell_length' : '100'})
 
-osmtool.save_to_xml('berkeley3.xml')
+osmtool.save_to_xml('berkeley_large.xml')
 
 print('DONE')
