@@ -1,5 +1,6 @@
 from . import osm_query
 from lxml import etree
+import networkx as nx
 
 road_param_types = {
     'residential':      {'id': 0, 'capacity': 2000, 'speed': 100, 'jam_density': 100},
@@ -124,6 +125,22 @@ class OSMLoader:
         if(model['type']=='mciro'):
             self.model['sim_dt']=model['sim_dt']
 
+    def keep_single_network(self):
+        G = nx.Graph()
+        for link in self.scenario['links'].values():
+            G.add_edge(link['start_node_id'],link['end_node_id'],id=link['id'])
+        lrg_net = max(nx.connected_components(G), key=len)
+        self.scenario['links'] = { id:link for (id,link) in self.scenario['links'].items() if link['start_node_id'] in lrg_net and link['end_node_id'] in lrg_net}
+        linkids = self.scenario['links'].keys() 
+        self.scenario['road_conns'] = [rc for rc in self.scenario['road_conns'] if rc['in_link'] in linkids and rc['out_link'] in linkids]
+        self.scenario['external_nodes'] = lrg_net
+        self.scenario['internal_nodes'] = set()
+        for link in self.scenario['links'].values():
+            self.scenario['internal_nodes'].update(link['nodes'])
+        all_node_ids = lrg_net.union(self.scenario['internal_nodes'])
+        self.scenario['nodes'] = { id:node for (id,node) in self.scenario['nodes'].items() if node['id'] in all_node_ids }
+
+
     def set_demands_per_commodity_and_source_vph(self,demand):
         self.scenario['demand_per_commodity_source'] = demand
 
@@ -217,7 +234,6 @@ class OSMLoader:
                 'end_node_id': str(link['end_node_id']),
                 'roadparam': str(link['roadparam'])
             })
-            # link_id += 1
 
             epoints = etree.SubElement(elink,'points')
             for node_id in link['nodes']:
