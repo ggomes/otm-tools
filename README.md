@@ -24,6 +24,7 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.5+10-LTS, mixed mode)
 **3.** Install the required Python packages, for example with the `conda` YAML file:
 ```BASH
 conda env create -f otmenv.yml 
+conda activate otm
 ```
 
 **4.** Build the `py4j` connector. From `otm-tools/python` folder, run 
@@ -35,8 +36,8 @@ python setup.py develop
 ```BASH
 python demo_load.py
 python demo_osm.py
-python demo_run.py
 python demo_run_step.py
+python demo_run.py
 ```
 
 ## Matlab (not supported) ##
