@@ -1,6 +1,6 @@
 import os
 import inspect
-from OTMWrapper import OTMWrapper
+from pyotm.OTMWrapper import OTMWrapper
 
 start_time = 0.
 duration = 3600.

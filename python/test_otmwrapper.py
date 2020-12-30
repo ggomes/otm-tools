@@ -1,6 +1,6 @@
 import os
 import inspect
-from OTMWrapper import OTMWrapper
+from pyotm.OTMWrapper import OTMWrapper
 
 # define the input file
 this_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))

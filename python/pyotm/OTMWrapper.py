@@ -1,4 +1,4 @@
-from otm.JavaConnect import JavaConnect
+from pyotm.JavaConnect import JavaConnect
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
@@ -6,7 +6,6 @@ import matplotlib.colors as pltc
 from random import sample
 import pandas as pd
 import networkx as nx
-
 
 class OTMWrapper:
 
@@ -27,33 +26,34 @@ class OTMWrapper:
             self.conn.close()
 
     def describe(self):
-        print("# nodes: {}".format(self.otm.scenario().get_num_nodes()))
-        print("# links: {}".format(self.otm.scenario().get_num_links()))
-        print("# commodities: {}".format(self.otm.scenario().get_num_commodities()))
-        print("# subnetworks: {}".format(self.otm.scenario().get_num_subnetworks()))
-        print("# sensors: {}".format(self.otm.scenario().get_num_sensors()))
-        print("# actuators: {}".format(self.otm.scenario().get_num_actuators()))
-        print("# controllers: {}".format(self.otm.scenario().get_num_controllers()))
+        print("# nodes: {}".format(self.otm.scenario().num_nodes()))
+        print("# links: {}".format(self.otm.scenario().num_links()))
+        print("# commodities: {}".format(self.otm.scenario().num_commodities()))
+        print("# subnetworks: {}".format(self.otm.scenario().num_subnetworks()))
+        print("# sensors: {}".format(self.otm.scenario().num_sensors()))
+        print("# actuators: {}".format(self.otm.scenario().num_actuators()))
+        print("# controllers: {}".format(self.otm.scenario().num_controllers()))
 
     def show_network(self, linewidth=1):
 
         fig, ax = plt.subplots()
 
         nodes = {}
-        for node_id in self.otm.scenario().get_node_ids():
-            node_info = self.otm.scenario().get_node_with_id(node_id)
-            nodes[node_id] = {'x': node_info.getX(), 'y': node_info.getY()}
+        for node_id in self.otm.scenario().node_ids():
+            node = self.otm.scenario().get_node(node_id)
+            nodes[node_id] = {'x': node.get_x(), 'y': node.get_y()}
 
         lines = []
         minX = float('Inf')
         maxX = -float('Inf')
         minY = float('Inf')
         maxY = -float('Inf')
-        for link_id in self.otm.scenario().get_link_ids():
-            link_info = self.otm.scenario().get_link_with_id(link_id)
+        for link_id in self.otm.scenario().link_ids():
 
-            start_point = nodes[link_info.getStart_node_id()]
-            end_point = nodes[link_info.getEnd_node_id()]
+            link = self.otm.scenario().get_link(link_id)
+
+            start_point = nodes[link.get_start_node_id()]
+            end_point = nodes[link.get_end_node_id()]
 
             p0 = (start_point['x'], start_point['y'])
             p1 = (end_point['x'], end_point['y'])
@@ -91,9 +91,9 @@ class OTMWrapper:
         self.duration = float(duration)
 
         self.otm.output().clear()
-        link_ids = self.otm.scenario().get_link_ids()
-        self.otm.output().request_links_flow(None, link_ids, float(output_dt))
-        self.otm.output().request_links_veh(None, link_ids, float(output_dt))
+        link_ids = self.otm.scenario().link_ids()
+        self.otm.output().request_links_flow(None, None, None, link_ids, float(output_dt))
+        self.otm.output().request_links_veh(None, None, None, link_ids, float(output_dt))
 
         # run the simulation
         self.otm.run(self.start_time, self.duration)
@@ -113,34 +113,34 @@ class OTMWrapper:
         link_end = []
         link_is_source = []
         link_is_sink = []
-        link_capacity = []
-        link_ffspeed = []
-        link_jamdensity = []
-        link_travel_time = []
-        for link_id in self.otm.scenario().get_link_ids():
-            link = self.otm.scenario().get_link_with_id(link_id)
+        # link_capacity = []
+        # link_ffspeed = []
+        # link_jamdensity = []
+        # link_travel_time = []
+        for link_id in self.otm.scenario().link_ids():
+            link = self.otm.scenario().get_link(link_id)
             link_ids.append(link_id)
-            link_lengths.append(link.getFull_length())
-            link_lanes.append(link.getFull_lanes())
-            link_start.append(link.getStart_node_id())
-            link_end.append(link.getEnd_node_id())
-            link_is_source.append(link.isIs_source())
-            link_is_sink.append(link.isIs_sink())
-            link_capacity.append(link.get_capacity_vphpl())
-            link_ffspeed.append(link.get_ffspeed_kph())
-            link_jamdensity.append(link.get_jam_density_vpkpl())
-            link_travel_time.append(link.getFull_length() * 3.6 / link.get_ffspeed_kph())
+            link_lengths.append(link.get_full_length())
+            link_lanes.append(link.get_full_lanes())
+            link_start.append(link.get_start_node_id())
+            link_end.append(link.get_end_node_id())
+            link_is_source.append(link.get_is_source())
+            link_is_sink.append(link.get_is_sink())
+            # link_capacity.append(link.get_capacity_vphpl())
+            # link_ffspeed.append(link.get_ffspeed_kph())
+            # link_jamdensity.append(link.get_jam_density_vpkpl())
+            # link_travel_time.append(link.get_full_length() * 3.6 / link.get_ffspeed_kph())
 
-        return pd.DataFrame(data={'id': link_ids,'length_meter': link_lengths,'lanes': link_lanes,'start_node': link_start,'end_node': link_end,'is_source': link_is_source,'is_sink': link_is_sink,'capacity_vphpl': link_capacity,'speed_kph': link_ffspeed,'max_vpl': link_jamdensity,'travel_time_sec': link_travel_time})
+        return pd.DataFrame(data={'id': link_ids,'length_meter': link_lengths,'lanes': link_lanes,'start_node': link_start,'end_node': link_end,'is_source': link_is_source,'is_sink': link_is_sink}) #,'capacity_vphpl': link_capacity,'speed_kph': link_ffspeed,'max_vpl': link_jamdensity,'travel_time_sec': link_travel_time})
 
     def to_networkx(self):
         G = nx.MultiDiGraph()
-        for node_id in self.otm.scenario().get_node_ids():
-            node = self.otm.scenario().get_node_with_id(node_id)
-            G.add_node(node_id, pos=(node.getX(), node.getY()))
-        for link_id in self.otm.scenario().get_link_ids():
-            link = self.otm.scenario().get_link_with_id(link_id)
-            G.add_edge(link.getStart_node_id(),link.getEnd_node_id(), id=link_id)
+        for node_id in self.otm.scenario().node_ids():
+            node = self.otm.scenario().get_node(node_id)
+            G.add_node(node_id, pos=(node.get_x(), node.get_y))
+        for link_id in self.otm.scenario().link_ids():
+            link = self.otm.scenario().get_link(link_id)
+            G.add_edge(link.get_start_node_id(),link.get_end_node_id(), id=link_id)
         return G
 
     def get_state_trajectory(self):
@@ -185,18 +185,18 @@ class OTMWrapper:
                 if (classname == "OutputLinkVehicles"):
                     X['vehs'][i, :] = np.array(list(z.get_values()))
 
-        X['speed_kph'] = np.empty([num_links, num_time])
-        for i in range(len(link_list)):
-            link_info = self.otm.scenario().get_link_with_id(link_list[i])
-            if link_info.isIs_source():
-                X['speed_kph'][i, :] = np.nan;
-            else:
-                ffspeed_kph = link_info.get_ffspeed_kph()
-                link_length_km = link_info.getFull_length() / 1000.0;
+        # X['speed_kph'] = np.empty([num_links, num_time])
+        # for i in range(len(link_list)):
+        #     link = self.otm.scenario().get_link(link_list[i])
+        #     if link.get_is_source():
+        #         X['speed_kph'][i, :] = np.nan;
+        #     else:
+        #         ffspeed_kph = link.get_ffspeed_kph()
+        #         link_length_km = link.get_full_length() / 1000.0;
 
-                with np.errstate(divide='ignore', invalid='ignore'):
-                    speed_kph = np.nan_to_num(link_length_km * np.divide(X['flows_vph'][i], X['vehs'][i]));
-                speed_kph[speed_kph > ffspeed_kph] = ffspeed_kph;
-                X['speed_kph'][i] = speed_kph;
+        #         with np.errstate(divide='ignore', invalid='ignore'):
+        #             speed_kph = np.nan_to_num(link_length_km * np.divide(X['flows_vph'][i], X['vehs'][i]));
+        #         speed_kph[speed_kph > ffspeed_kph] = ffspeed_kph;
+        #         X['speed_kph'][i] = speed_kph;
 
         return X

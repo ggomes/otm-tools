@@ -1,4 +1,4 @@
-from otm.OSMLoader import OSMLoader
+from pyotm.OSMLoader import OSMLoader
 import pickle
 
 osmtool = OSMLoader()
