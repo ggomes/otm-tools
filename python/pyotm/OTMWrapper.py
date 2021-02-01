@@ -9,7 +9,7 @@ import networkx as nx
 
 class OTMWrapper:
 
-    def __init__(self, configfile, jaxb_only=False, port_num = 25333):
+    def __init__(self, configfile, port_num = 25333):
 
         self.configfile = configfile
         self.sim_output = None
@@ -18,8 +18,8 @@ class OTMWrapper:
 
         self.conn = JavaConnect(port_num = port_num)
         if self.conn.pid is not None:
-            self.otm = self.conn.gateway.get()
-            self.otm.load(configfile, True, jaxb_only)
+            self.otm = self.conn.gateway.get(configfile, True)
+            # self.otm.load(configfile, True, jaxb_only)
 
     def __del__(self):
         if hasattr(self, 'conn') and self.conn is not None:
