@@ -8,6 +8,9 @@ import pandas as pd
 import networkx as nx
 
 class OTMWrapper:
+    """Provides a connection to the OTM API via py4j. Also includes convenience methods for running simulations and
+    processing the output.
+    """
 
     def __init__(self, configfile, port_num = 25333):
 
@@ -19,13 +22,17 @@ class OTMWrapper:
         self.conn = JavaConnect(port_num = port_num)
         if self.conn.pid is not None:
             self.otm = self.conn.gateway.get(configfile, True)
-            # self.otm.load(configfile, True, jaxb_only)
+
+        # if self.otm==None:
+        #     error("Error loading configuration file.")
 
     def __del__(self):
         if hasattr(self, 'conn') and self.conn is not None:
             self.conn.close()
 
     def describe(self):
+        """ High level description of the scenario."""
+
         print("# nodes: {}".format(self.otm.scenario().num_nodes()))
         print("# links: {}".format(self.otm.scenario().num_links()))
         print("# commodities: {}".format(self.otm.scenario().num_commodities()))
@@ -35,6 +42,7 @@ class OTMWrapper:
         print("# controllers: {}".format(self.otm.scenario().num_controllers()))
 
     def show_network(self, linewidth=1):
+        """ Plot the network using node locations."""
 
         fig, ax = plt.subplots()
 
@@ -48,7 +56,7 @@ class OTMWrapper:
         maxX = -float('Inf')
         minY = float('Inf')
         maxY = -float('Inf')
-        for link_id in self.otm.scenario().link_ids():
+        for link_id in self.otm.scenario().network().link_ids():
 
             link = self.otm.scenario().get_link(link_id)
 
@@ -86,6 +94,7 @@ class OTMWrapper:
 
     # run a simulation
     def run_simple(self, start_time=0., duration=3600., output_dt=30.):
+        """ Easy running method. Requests vehicle and flow outputs, and runs the simulation for a given duration. """
 
         self.start_time = float(start_time)
         self.duration = float(duration)
@@ -98,13 +107,8 @@ class OTMWrapper:
         # run the simulation
         self.otm.run(self.start_time, self.duration)
 
-    def initialize(self, start_time=0):
-        self.otm.initialize(start_time)
-
-    def advance(self, duration):
-        self.otm.advance(duration)
-
     def get_links_table(self):
+        """Creates a pandas dataframe with network link information."""
 
         link_ids = []
         link_lengths = []
@@ -134,6 +138,7 @@ class OTMWrapper:
         return pd.DataFrame(data={'id': link_ids,'length_meter': link_lengths,'lanes': link_lanes,'start_node': link_start,'end_node': link_end,'is_source': link_is_source,'is_sink': link_is_sink}) #,'capacity_vphpl': link_capacity,'speed_kph': link_ffspeed,'max_vpl': link_jamdensity,'travel_time_sec': link_travel_time})
 
     def to_networkx(self):
+        """ Creates a networkx graph."""
         G = nx.MultiDiGraph()
         for node_id in self.otm.scenario().node_ids():
             node = self.otm.scenario().get_node(node_id)
@@ -144,6 +149,8 @@ class OTMWrapper:
         return G
 
     def get_state_trajectory(self):
+        """Extracts the vehicles, flows, and speeds for each link in the network, following a run, and returns them
+        in a dictionary."""
         X = {'time': None, 'link_ids': None, 'vehs': None, 'flows_vph': None, 'speed_kph': None}
         output_data = self.otm.output().get_data()
         it = output_data.iterator()
