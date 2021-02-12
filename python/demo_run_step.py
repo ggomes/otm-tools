@@ -10,6 +10,10 @@ advance_time = 300.
 this_folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 root_folder = os.path.dirname(this_folder)
 configfile = os.path.join(root_folder, 'configs', 'line_macro.xml')
+
+if "otm" in locals():
+	del otm
+	
 otm = OTMWrapper(configfile)
 
 # initialize (prepare/rewind the simulation)

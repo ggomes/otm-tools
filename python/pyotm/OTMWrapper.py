@@ -6,6 +6,7 @@ import matplotlib.colors as pltc
 from random import sample
 import pandas as pd
 import networkx as nx
+from os import path
 
 class OTMWrapper:
     """Provides a connection to the OTM API via py4j. Also includes convenience methods for running simulations and
@@ -207,3 +208,79 @@ class OTMWrapper:
         #         X['speed_kph'][i] = speed_kph;
 
         return X
+
+    def read_lg_file(self,filename):
+        # read lane group output file
+        x = []
+        with open(filename) as fp:
+            while True:
+                line = fp.readline()
+                if not line:
+                    break
+                lgid, linkid, startlane, endlane = line.strip().split(",")
+                x.append({'lgid': lgid,
+                          'linkid': linkid,
+                          'startlane': startlane,
+                          'endlane': endlane,
+                          'as_str': "{0} ({1}-{2})".format(linkid, startlane, endlane)})
+        return x
+
+    def read_cell_file(self,filename):
+        # read cell output file
+        x = []
+        with open(filename) as fp:
+            while True:
+                line = fp.readline()
+                if not line:
+                    break
+                cind, lgid, linkid, startlane, endlane = line.strip().split(",")
+                x.append({'cellind': cind,
+                          'lgid': lgid,
+                          'linkid': linkid,
+                          'startlane': startlane,
+                          'endlane': endlane,
+                          'as_str': "link {0}, cell {1} ({2}-{3})".format(linkid, cind, startlane, endlane)})
+        return x
+
+    def load_data(self,prefix, output_folder, comm, granularity, quantity):
+
+        if granularity not in ('link', 'lg', 'cell'):
+            print('Error, wrong granularity')
+            return (None, None, None)
+
+        if quantity not in ('flw', 'veh', 'lcin', 'lcout'):
+            print('Error, wrong quantity')
+            return (None, None, None)
+
+        if comm == None:
+            comm = 'allcomms'
+
+        datafile = "{0}/{1}_{2}_{3}_{4}.txt".format(output_folder, prefix, comm, granularity, quantity)
+        colsfile = "{0}/{1}_{2}_{3}_{4}_cols.txt".format(output_folder, prefix, comm, granularity, quantity)
+        timefile = "{0}/{1}_{2}_{3}_{4}_time.txt".format(output_folder, prefix, comm, granularity, quantity)
+
+        if not path.exists(datafile):
+            print("Error: File not found: " + datafile)
+            return (None, None, None)
+
+        data = np.loadtxt(datafile, delimiter=',')
+
+        cols = []
+
+        if granularity == 'link':
+            for linkid in np.loadtxt(colsfile, delimiter=',', dtype=int, ndmin=1):
+                cols.append({'linkid': linkid, 'as_str': "link {0}".format(linkid)})
+        elif granularity == 'lg':
+            cols = self.read_lg_file(colsfile)
+        elif granularity == 'cell':
+            cols = self.read_cell_file(colsfile)
+
+        time = np.loadtxt(timefile, delimiter=',')
+        return (data, cols, time)
+
+    def lineplot(self,time, data, cols, title=""):
+        plt.figure(figsize=(10, 4))
+        plt.plot(time, data)
+        plt.legend([col['as_str'] for col in cols])
+        plt.grid()
+        plt.title(title)

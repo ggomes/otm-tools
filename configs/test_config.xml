@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<scenario xmlns="opentrafficmodels">
+    <commodities>
+        <commodity id="0" name="SOV" pvequiv="1.0" pathfull="false"/>
+        <commodity id="1" name="HOV" pvequiv="1.0" pathfull="false"/>
+    </commodities>
+    <network>
+        <nodes>
+            <node id="1"/>
+            <node id="2"/>
+            <node id="3"/>
+            <node id="4"/>
+            <node id="5"/>
+            <node id="6"/>
+            <node id="7"/>
+            <node id="8"/>
+            <node id="9"/>
+            <node id="10"/>
+            <node id="11"/>
+            <node id="12"/>
+            <node id="13"/>
+        </nodes>
+        <links>
+            <link id="1" length="500" full_lanes="3" start_node_id="1" end_node_id="2" roadparam="0" roadgeom="5" road_type="freeway" alt_next_link="2"/>
+            <link id="2" length="500" full_lanes="3" start_node_id="2" end_node_id="3" roadparam="0" roadgeom="3" road_type="freeway" alt_next_link="3"/>
+            <link id="3" length="1000" full_lanes="3" start_node_id="3" end_node_id="4" roadparam="0" roadgeom="4" road_type="freeway"/>
+            <link id="4" length="1000" full_lanes="1" start_node_id="7" end_node_id="2" roadparam="0" roadgeom="1" road_type="onramp"/>
+            <link id="5" length="1000" full_lanes="1" start_node_id="8" end_node_id="7" roadparam="0" roadgeom="7" road_type="connector" alt_next_link="4"/>
+            <link id="6" length="1000" full_lanes="3" start_node_id="9" end_node_id="10" roadparam="0" roadgeom="0" road_type="freeway" alt_next_link="8"/>
+            <link id="7" length="1000" full_lanes="1" start_node_id="10" end_node_id="8" roadparam="0" roadgeom="6" road_type="offramp"/>
+            <link id="8" length="1000" full_lanes="3" start_node_id="10" end_node_id="11" roadparam="0" roadgeom="9" road_type="freeway"/>
+            <link id="9" length="1000" full_lanes="3" start_node_id="12" end_node_id="1" roadparam="0" roadgeom="8" road_type="freeway" alt_next_link="1"/>
+            <link id="10" length="1000" full_lanes="3" start_node_id="13" end_node_id="9" roadparam="0" roadgeom="2" road_type="freeway" alt_next_link="6"/>
+        </links>
+        <roadgeoms>
+            <roadgeom id="0">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="1">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="2">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="3">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="4">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="5">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="6">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="7">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="8">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+            <roadgeom id="9">
+                <add_lanes isopen="true" side="in" roadparam="0" lanes="1"/>
+            </roadgeom>
+        </roadgeoms>
+        <roadconnections>
+            <roadconnection id="1" in_link="1" in_link_lanes="1#1" out_link="2" out_link_lanes="1#1"/>
+            <roadconnection id="2" in_link="1" in_link_lanes="2#4" out_link="2" out_link_lanes="2#4"/>
+            <roadconnection id="3" in_link="2" in_link_lanes="1#1" out_link="3" out_link_lanes="1#1"/>
+            <roadconnection id="4" in_link="2" in_link_lanes="2#4" out_link="3" out_link_lanes="2#4"/>
+            <roadconnection id="5" in_link="4" out_link="2" out_link_lanes="2#4"/>
+            <roadconnection id="6" in_link="5" in_link_lanes="1#1" out_link="4" out_link_lanes="1#1"/>
+            <roadconnection id="7" in_link="5" in_link_lanes="2#2" out_link="4" out_link_lanes="2#2"/>
+            <roadconnection id="8" in_link="6" in_link_lanes="1#1" out_link="8" out_link_lanes="1#1"/>
+            <roadconnection id="9" in_link="6" in_link_lanes="2#4" out_link="8" out_link_lanes="2#4"/>
+            <roadconnection id="10" in_link="6" in_link_lanes="2#4" out_link="7"/>
+            <roadconnection id="11" in_link="7" in_link_lanes="1#1" out_link="5" out_link_lanes="1#1"/>
+            <roadconnection id="12" in_link="7" in_link_lanes="2#2" out_link="5" out_link_lanes="2#2"/>
+            <roadconnection id="13" in_link="9" in_link_lanes="1#1" out_link="1" out_link_lanes="1#1"/>
+            <roadconnection id="14" in_link="9" in_link_lanes="2#4" out_link="1" out_link_lanes="2#4"/>
+            <roadconnection id="15" in_link="10" in_link_lanes="1#1" out_link="6" out_link_lanes="1#1"/>
+            <roadconnection id="16" in_link="10" in_link_lanes="2#4" out_link="6" out_link_lanes="2#4"/>
+        </roadconnections>
+        <roadparams>
+            <roadparam id="0" capacity="2000.0" speed="105.02592" jam_density="109.99262"/>
+        </roadparams>
+    </network>
+    <models>
+        <model type="ctm" name="ctm" is_default="true">
+            <model_params sim_dt="5.0" max_cell_length="193.10905"/>
+            <lanechanges type="linklinear">
+                <lanechange>
+                    <parameters>
+                        <parameter name="alpha" value="1.000000"/>
+                        <parameter name="epsilon" value="1.300000"/>
+                        <parameter name="gamma" value="30.000000"/>
+                    </parameters>
+                </lanechange>
+            </lanechanges>
+        </model>
+    </models>
+    <demands>
+        <demand commodity_id="0" link_id="9" start_time="0.0" dt="3600.0">2400.0,3200.0,4000.0,4000.0,3200.0,2400.0</demand>
+        <demand commodity_id="1" link_id="9" start_time="0.0" dt="3600.0">600.0,800.0,1000.0,1000.0,800.0,600.0</demand>
+        <demand commodity_id="0" link_id="10" start_time="0.0" dt="3600.0">2400.0,3200.0,4000.0,4000.0,3200.0,2400.0</demand>
+        <demand commodity_id="1" link_id="10" start_time="0.0" dt="3600.0">600.0,800.0,1000.0,1000.0,800.0,600.0</demand>
+    </demands>
+    <splits/>
+   
+</scenario>
