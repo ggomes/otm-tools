@@ -59,15 +59,15 @@ class JavaConnect():
         # Here we wait for 0.5 sec to allow the java server to start
         time.sleep(0.4)
 
-    def to_int_set(self,pset):
-        # int_class = self.gateway.jvm.int
-        # int_array = self.gateway.new_array(int_class,2len(pset))
-
-        int_set = gateway.jvm.java.util.HashSet()
-
-        int_array[0] = 1
-        int_array[1] = 2
-        return int_array
+    # def to_int_set(self,pset):
+    #     # int_class = self.gateway.jvm.int
+    #     # int_array = self.gateway.new_array(int_class,2len(pset))
+    #
+    #     int_set = self.gateway.jvm.java.util.HashSet()
+    #
+    #     int_array[0] = 1
+    #     int_array[1] = 2
+    #     return int_array
 
     def close(self):
         if platform.system() == "Windows":

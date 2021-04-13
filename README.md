@@ -21,18 +21,22 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.5+10-LTS, mixed mode)
 
 **2.** Copy `otm-tools/setting.xml` to `~/.m2`. If you do not have this folder in your home directory, then run the `mvn` command to create it.
 
-**3.** Build the `py4j` connector. From `otm-tools/python` folder, run 
+**3.** Install the required Python packages, for example with the `conda` YAML file:
+```BASH
+conda env create -f otmenv.yml 
+conda activate otm
+```
+
+**4.** Build the `py4j` connector. From `otm-tools/python` folder, run 
 ```BASH
 python setup.py develop
 ```
 
-**4.** Install the required Python packages, for example with the `conda` YAML file:
+**5.** Test the installation by running the demos.
 ```BASH
-conda env create -f otmenv.yml 
-```
-
-**5.** Test the installation. Run one of the demos. For example, `demo_run.py` should generate a plot.
-```BASH
+python demo_load.py
+python demo_osm.py
+python demo_run_step.py
 python demo_run.py
 ```
 

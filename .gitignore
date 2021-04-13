@@ -4,6 +4,6 @@
 *.png
 java/demos/out/
 */.ipynb_checkpoints/
-*/*.ipynb
+python/Untitled.ipynb
 python/osm2otm/*.xml
 

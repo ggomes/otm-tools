@@ -1,16 +1,20 @@
+import error.OTMException;
 import py4j.GatewayServer;
-import utils.OTMUtils;
 
-public class OTMConnect {
+public class OTMGateway {
 
-	public api.OTM otm;
+	public core.OTM otm;
 
-	public OTMConnect() {
-		otm = new api.OTM();
+	public OTMGateway() {
 	}
 
-	public api.OTM get(){
-		return otm;
+	public core.OTM get(String configfile, boolean validate_pre_init){
+		try {
+			return new core.OTM(configfile,validate_pre_init);
+		} catch (OTMException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -20,7 +24,7 @@ public class OTMConnect {
 
 			// special case no command line arguments:
 			if(args.length==0) {
-				gatewayServer = new GatewayServer(new OTMConnect());
+				gatewayServer = new GatewayServer(new OTMGateway());
 				gatewayServer.start();
 				System.out.println("OTM connected on port " + gatewayServer.getPort());
 				return;
@@ -33,7 +37,7 @@ public class OTMConnect {
 
 				// specified port
 				if (cmd.equals("-port")) {
-					gatewayServer = new GatewayServer(new OTMConnect(), Integer.parseInt(args[1]));
+					gatewayServer = new GatewayServer(new OTMGateway(), Integer.parseInt(args[1]));
 					gatewayServer.start();
 					System.out.println("OTM connected on port " + gatewayServer.getPort());
 					return;
@@ -41,7 +45,7 @@ public class OTMConnect {
 
 				// version
 				else if (cmd.equals("-version")){
-					System.out.println("otm-sim: " + api.OTM.get_version());
+					System.out.println("otm-sim: " + core.OTM.get_version());
 					return;
 				}
 
