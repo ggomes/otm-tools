@@ -17,14 +17,14 @@ if "otm" in locals():
 otm = OTMWrapper(configfile)
 
 # initialize (prepare/rewind the simulation)
-otm.initialize(start_time)
+otm.otm.initialize(start_time)
 
 # run step-by-step using the 'advance' method
 time = start_time
 end_time = start_time + duration
 
 while(time<end_time):
-	otm.advance(advance_time)
+	otm.otm.advance(advance_time)
 
 	# Insert your code here -----
 	print(otm.otm.get_current_time())

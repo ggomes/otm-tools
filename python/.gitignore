@@ -6,6 +6,7 @@ pyotm/data/otm-python-api-1.0-SNAPSHOT-jar-with-dependencies.jar
 *.whl
 *.iml
 .DS_Store
+output/
 
 # Created by https://www.gitignore.io/api/python
 
