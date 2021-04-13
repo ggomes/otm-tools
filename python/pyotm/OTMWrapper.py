@@ -101,7 +101,7 @@ class OTMWrapper:
         self.duration = float(duration)
 
         self.otm.output().clear()
-        link_ids = self.otm.scenario().link_ids()
+        link_ids = self.otm.scenario().network().link_ids()
         self.otm.output().request_links_flow(None, None, None, link_ids, float(output_dt))
         self.otm.output().request_links_veh(None, None, None, link_ids, float(output_dt))
 
