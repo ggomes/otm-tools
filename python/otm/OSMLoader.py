@@ -2,13 +2,22 @@ from . import osm_query
 from lxml import etree
 import networkx as nx
 
-road_param_types = {
-    'residential':      {'id': 0, 'capacity': 2000, 'speed': 100, 'jam_density': 100},
-    'tertiary':         {'id': 1, 'capacity': 2001, 'speed': 101, 'jam_density': 101},
-    'tertiary_link':    {'id': 2, 'capacity': 2002, 'speed': 102, 'jam_density': 102},
-    'unclassified':     {'id': 3, 'capacity': 2003, 'speed': 103, 'jam_density': 103},
-    'secondary':        {'id': 4, 'capacity': 2004, 'speed': 104, 'jam_density': 104},
-}
+# road_param_types = {
+#     'residential':      {'id': 0, 'capacity': 2000, 'speed': 100, 'jam_density': 100},
+#     'tertiary':         {'id': 1, 'capacity': 2001, 'speed': 101, 'jam_density': 101},
+#     'tertiary_link':    {'id': 2, 'capacity': 2002, 'speed': 102, 'jam_density': 102},
+#     'unclassified':     {'id': 3, 'capacity': 2003, 'speed': 103, 'jam_density': 103},
+#     'secondary':        {'id': 4, 'capacity': 2004, 'speed': 104, 'jam_density': 104},
+# }
+
+road_param_types = [
+    {'name': 'residential'  , 'capacity': 1200, 'speed': 40, 'jam_density': 100},
+    {'name': 'tertiary'     , 'capacity': 1200, 'speed': 40, 'jam_density': 100},
+    {'name': 'tertiary_link', 'capacity': 1200, 'speed': 40, 'jam_density': 100},
+    {'name': 'unclassified' , 'capacity': 1200, 'speed': 40, 'jam_density': 100},
+    {'name': 'secondary'    , 'capacity': 1200, 'speed': 40, 'jam_density': 100},
+]
+
 
 class OSMLoader:
 
@@ -44,7 +53,7 @@ class OSMLoader:
                     merge_link = self.scenario['links'][next(iter(start_node['in_links']))]
 
                     # merge if they have the same number of lanes
-                    merge_ok = merge_link['lanes']==short_link['lanes']
+                    merge_ok = True # merge_link['lanes']==short_link['lanes']
 
                     if merge_ok:
 
@@ -76,7 +85,7 @@ class OSMLoader:
                     merge_link = self.scenario['links'][next(iter(end_node['out_links']))]
 
                     # merge if they have the same number of lanes
-                    merge_ok = merge_link['lanes']==short_link['lanes']
+                    merge_ok = True # merge_link['lanes']==short_link['lanes']
 
                     if merge_ok:
 
@@ -106,8 +115,6 @@ class OSMLoader:
             # if you go through all short_links and find nothing, then quit
             if not foundone:
                 break
-
-        print(len(self.scenario['links']))
 
     # model is a dictionary with minimal structure {'type':TYPE}
     # TYPE is one of {'ctm','spaceq','micro','none'}
@@ -146,11 +153,11 @@ class OSMLoader:
         for link_pair in link_pairs:
             
             if link_pair[0] not in links:
-                print("Warning: Bad link id: ", link_pair[0])
+                print("[WARNING] Bad link id: ", link_pair[0])
                 continue
             
             if link_pair[1] not in links:
-                print("Warning: Bad link id: ", link_pair[1])
+                print("[WARNING] Bad link id: ", link_pair[1])
                 continue
 
             linkA = links[link_pair[0]]
@@ -163,7 +170,7 @@ class OSMLoader:
                 link0 = linkA
                 link1 = linkB
             else:
-                print("These links are not connected")
+                print("[WARNING] These links are not connected")
                 continue
 
             node_id = link0['end_node_id']
@@ -203,7 +210,6 @@ class OSMLoader:
 
             # delete link1
             del links[link1['id']]
-
 
     def set_demands_per_commodity_and_source_vph(self,demand):
         self.scenario['demand_per_commodity_source'] = demand
@@ -256,13 +262,13 @@ class OSMLoader:
 
         # road params ..............................
         road_params = etree.SubElement(network, 'roadparams')
-        for road_type_name,road_type_params in road_param_types.items():
+        for c, rp in enumerate(road_param_types):
             etree.SubElement(road_params, 'roadparam', {
-                'id': str(road_type_params['id']),
-                'name': road_type_name,
-                'capacity': str(road_type_params['capacity']),
-                'speed': str(road_type_params['speed']),
-                'jam_density': str(road_type_params['jam_density'])
+                'id': str(c),
+                'name': rp['name'],
+                'capacity': str(rp['capacity']),
+                'speed': str(rp['speed']),
+                'jam_density': str(rp['jam_density'])
             })
 
         # get all node positions ......................
@@ -285,10 +291,10 @@ class OSMLoader:
             # link_id_map[str(link['id'])] = link_id
 
             if link['start_node_id'] not in self.scenario['nodes'].keys():
-                print('ERROR: link[start_node_id] not in nodes.keys()')
+                print('[WARNING] link[start_node_id] not in nodes.keys()')
 
             if link['end_node_id'] not in self.scenario['nodes'].keys():
-                print('ERROR: link[end_node_id] not in nodes.keys()')
+                print('[WARNING] link[end_node_id] not in nodes.keys()')
 
             elink=etree.SubElement(link_set, 'link', {
                 'id': str(link_osmid),
@@ -334,7 +340,7 @@ class OSMLoader:
             if node['type']=='traffic_signals':
 
                 if node['id'] not in self.scenario['external_nodes']:
-                    print("Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
+                    print("[WARNING] Skipping traffic signal on internal node ", node['id'], " (consider splitting the link)")
                     continue
 
                 in_links = [self.scenario['links'][link_id] for link_id in node['in_links']]
@@ -349,7 +355,7 @@ class OSMLoader:
             if node['type']=='stop':
 
                 if node['id'] not in self.scenario['external_nodes']:
-                    print("Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
+                    print("[WARNING] Skipping stop sign on internal node ", node['id'], " (consider splitting the link)")
                     continue
 
                 actuator=etree.SubElement(actuators,'actuator',{'id':str(actuator_id),'type':'stop'})
@@ -408,3 +414,34 @@ class OSMLoader:
         with open(outfile, 'wb') as xml_file:
             xml_file.write(etree.tostring(scenario, pretty_print=True))
 
+    def get_maximum_timestep(self):
+
+        maxdt = float('inf') 
+        for link in self.scenario['links'].values():
+            
+            rp = road_param_types[link['roadparam']]
+            v = rp['speed']
+            f = rp['capacity']
+            rho = rp['jam_density']
+            w = f*v/(v*rho-f)
+            mymaxdt = link['length'] / max(v,w)
+            if mymaxdt<maxdt:
+                restr_link = link['id']
+                maxdt = mymaxdt
+
+        maxdt *= 3.6
+        return (maxdt,restr_link)
+
+    def get_link_timesteps(self):
+
+        dts = {}
+        for link in self.scenario['links'].values():
+            
+            rp = road_param_types[link['roadparam']]
+            v = rp['speed']
+            f = rp['capacity']
+            rho = rp['jam_density']
+            w = f*v/(v*rho-f)
+            dts[link['id']] = 3.6 * link['length'] / max(v,w)
+
+        return dts

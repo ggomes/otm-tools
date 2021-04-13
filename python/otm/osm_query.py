@@ -380,19 +380,19 @@ def __read_way(element,fixes):
 
     # check no clash in turn, turn:forward, turn:backward, turn:both_ways
     if 'turn' in tags and 'turn:forward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn' in tags and 'turn:forward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn' in tags and 'turn:forward' in tags")
 
     if 'turn' in tags and 'turn:backward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn' in tags and 'turn:backward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn' in tags and 'turn:backward' in tags")
 
     if 'turn' in tags and 'turn:both_ways' in tags:
-        print("[ERROR] Link", link['id'] , "'turn' in tags and 'turn:both_ways' in tags")
+        print("[WARNING] Link", link['id'] , "'turn' in tags and 'turn:both_ways' in tags")
 
     if 'turn:both_ways' in tags and 'turn:forward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:both_ways' in tags and 'turn:forward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:both_ways' in tags and 'turn:forward' in tags")
 
     if 'turn:both_ways' in tags and 'turn:backward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:both_ways' in tags and 'turn:backward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:both_ways' in tags and 'turn:backward' in tags")
 
     # if no clash, copy turn and turn:both_ways to turn:forward and turn:backward
     if 'turn' in tags:
@@ -405,19 +405,19 @@ def __read_way(element,fixes):
 
     # check no clash turn:lanes, turn:lanes:forward, turn:lanes:backward, turn:lanes:both_ways
     if 'turn:lanes' in tags and 'turn:lanes:forward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:lanes' in tags and 'turn:lanes:forward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:lanes' in tags and 'turn:lanes:forward' in tags")
 
     if 'turn:lanes' in tags and 'turn:lanes:backward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:lanes' in tags and 'turn:lanes:backward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:lanes' in tags and 'turn:lanes:backward' in tags")
 
     if 'turn:lanes' in tags and 'turn:lanes:both_ways' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:lanes' in tags and 'turn:lanes:both_ways' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:lanes' in tags and 'turn:lanes:both_ways' in tags")
 
     if 'turn:lanes:both_ways' in tags and 'turn:lanes:forward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:lanes:both_ways' in tags and 'turn:lanes:forward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:lanes:both_ways' in tags and 'turn:lanes:forward' in tags")
 
     if 'turn:lanes:both_ways' in tags and 'turn:lanes:backward' in tags:
-        print("[ERROR] Link", link['id'] , "'turn:lanes:both_ways' in tags and 'turn:lanes:backward' in tags")
+        print("[WARNING] Link", link['id'] , "'turn:lanes:both_ways' in tags and 'turn:lanes:backward' in tags")
 
     # if no clash, copy turn and turn:lanes:both_ways to turn:lanes:forward and turn:lanes:backward
     if 'turn:lanes' in tags:
@@ -431,11 +431,11 @@ def __read_way(element,fixes):
     # check clash turn:lanes:* and turn:*
     if 'turn:lanes:forward' in tags and 'turn:forward' in tags:
         if tags['turn:lanes:forward'] != tags['turn:forward']:
-            print("[ERROR] Link", link['id'] , "'turn:lanes:forward' in tags and 'turn:forward' in tags")
+            print("[WARNING] Link", link['id'] , "'turn:lanes:forward' in tags and 'turn:forward' in tags")
 
     if 'turn:lanes:backward' in tags and 'turn:backward' in tags:
         if tags['turn:lanes:backward'] != tags['turn:backward']:
-            print("[ERROR] Link", link['id'] , "'turn:lanes:backward' in tags and 'turn:backward' in tags")
+            print("[WARNING] Link", link['id'] , "'turn:lanes:backward' in tags and 'turn:backward' in tags")
 
     # copy turn to turn lanes
     if 'turn:forward' in tags:

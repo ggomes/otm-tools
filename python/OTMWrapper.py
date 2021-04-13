@@ -104,34 +104,34 @@ class OTMWrapper:
     def advance(self, duration):
         self.otm.advance(duration)
 
-    def get_links_table(self):
+    # def get_links_table(self):
 
-        link_ids = []
-        link_lengths = []
-        link_lanes = []
-        link_start = []
-        link_end = []
-        link_is_source = []
-        link_is_sink = []
-        link_capacity = []
-        link_ffspeed = []
-        link_jamdensity = []
-        link_travel_time = []
-        for link_id in self.otm.scenario().get_link_ids():
-            link = self.otm.scenario().get_link_with_id(link_id)
-            link_ids.append(link_id)
-            link_lengths.append(link.getFull_length())
-            link_lanes.append(link.getFull_lanes())
-            link_start.append(link.getStart_node_id())
-            link_end.append(link.getEnd_node_id())
-            link_is_source.append(link.isIs_source())
-            link_is_sink.append(link.isIs_sink())
-            link_capacity.append(link.get_capacity_vphpl())
-            link_ffspeed.append(link.get_ffspeed_kph())
-            link_jamdensity.append(link.get_jam_density_vpkpl())
-            link_travel_time.append(link.getFull_length() * 3.6 / link.get_ffspeed_kph())
+    #     link_ids = []
+    #     link_lengths = []
+    #     link_lanes = []
+    #     link_start = []
+    #     link_end = []
+    #     link_is_source = []
+    #     link_is_sink = []
+    #     link_capacity = []
+    #     link_ffspeed = []
+    #     link_jamdensity = []
+    #     link_travel_time = []
+    #     for link_id in self.otm.scenario().get_link_ids():
+    #         link = self.otm.scenario().get_link_with_id(link_id)
+    #         link_ids.append(link_id)
+    #         link_lengths.append(link.getFull_length())
+    #         link_lanes.append(link.getFull_lanes())
+    #         link_start.append(link.getStart_node_id())
+    #         link_end.append(link.getEnd_node_id())
+    #         link_is_source.append(link.isIs_source())
+    #         link_is_sink.append(link.isIs_sink())
+    #         link_capacity.append(link.get_capacity_vphpl())
+    #         link_ffspeed.append(link.get_ffspeed_kph())
+    #         link_jamdensity.append(link.get_jam_density_vpkpl())
+    #         link_travel_time.append(link.getFull_length() * 3.6 / link.get_ffspeed_kph())
 
-        return pd.DataFrame(data={'id': link_ids,'length_meter': link_lengths,'lanes': link_lanes,'start_node': link_start,'end_node': link_end,'is_source': link_is_source,'is_sink': link_is_sink,'capacity_vphpl': link_capacity,'speed_kph': link_ffspeed,'max_vpl': link_jamdensity,'travel_time_sec': link_travel_time})
+    #     return pd.DataFrame(data={'id': link_ids,'length_meter': link_lengths,'lanes': link_lanes,'start_node': link_start,'end_node': link_end,'is_source': link_is_source,'is_sink': link_is_sink,'capacity_vphpl': link_capacity,'speed_kph': link_ffspeed,'max_vpl': link_jamdensity,'travel_time_sec': link_travel_time})
 
     def to_networkx(self):
         G = nx.MultiDiGraph()
