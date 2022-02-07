@@ -17,7 +17,7 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.5+10-LTS, mixed mode)
 
 ## Python ##
 
-**1.** `otm-tools` uses `py4j` to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. You will need Apache [Maven](https://maven.apache.org/) to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it.
+**1.** `otm-tools` uses `py4j` to communicate between OTM and Python code. The `python/javacnct` folder contains the connector class for the Java side. You will need Apache [Maven](https://maven.apache.org/) to build this code. Follow [these instructions](https://maven.apache.org/install.html) to install Maven if you do not already have it. It can be helpful to set JAVA_HOME to your Java 11 installation if you have multiple versions of Java installed.
 
 **2.** Copy `otm-tools/settings.xml` to `~/.m2`. If you do not have this folder in your home directory, then run the `mvn` command to create it.
 
@@ -25,6 +25,13 @@ Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.5+10-LTS, mixed mode)
 ```BASH
 conda env create -f otmenv.yml 
 conda activate otm
+```
+or using a virtualenv, pip and the requirements.txt file (Java dependencies need to be installe separately):
+```BASH
+python -m venv otm
+source otm/bin/activate
+cd otm-tools/python
+pip install -r requirements.txt
 ```
 
 **4.** Build the `py4j` connector. From `otm-tools/python` folder, run 
