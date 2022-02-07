@@ -56,8 +56,8 @@ class JavaConnect():
             retcode = call(['java', '-jar', jar_file_name, '-port',port_number])
             sys.exit()
 
-        # Here we wait for 0.5 sec to allow the java server to start
-        time.sleep(0.4)
+        # Here we wait for 4 sec to allow the java server to start
+        time.sleep(4.0)
 
     # def to_int_set(self,pset):
     #     # int_class = self.gateway.jvm.int
